@@ -93,7 +93,7 @@ public:
 	 * @return 0 on success, negative values on error.
 	 */
 	int
-	insert(uint64_t key, value_type value)
+	insert(key_type key, value_type value)
 	{
 		auto dest_entry = root;
 		while (dest_entry->inode != nullptr) {
@@ -358,7 +358,7 @@ private:
 	 * Find critical bit.
 	 */
 	static int
-	find_crit_bit(uint64_t lhs, uint64_t rhs)
+	find_crit_bit(key_type lhs, key_type rhs)
 	{
 #ifndef _WIN32
 		return 64 - __builtin_clzll(lhs ^ rhs) - 1;
@@ -404,7 +404,7 @@ private:
 	 * Fetch leaf from the tree.
 	 */
 	nvobj::persistent_ptr<entry>
-	get_leaf(uint64_t key, nvobj::persistent_ptr<entry> *parent)
+	get_leaf(key_type key, nvobj::persistent_ptr<entry> *parent)
 	{
 		auto n = root;
 		nvobj::persistent_ptr<entry> p = nullptr;
