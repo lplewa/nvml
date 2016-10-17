@@ -70,9 +70,14 @@ make_persistent_example()
 		persistent_ptr<compound_type> comp; //
 	};
 
-	// create a pmemobj pool
+// create a pmemobj pool
+#ifndef _WIN32
 	auto pop = pool<root>::create("poolfile", "layout", PMEMOBJ_MIN_POOL,
 				      S_IWUSR | S_IRUSR);
+#else
+	auto pop = pool<root>::create("poolfile", "layout", PMEMOBJ_MIN_POOL,
+				      S_IWRITE | S_IREAD);
+#endif
 	auto proot = pop.get_root();
 
 	// typical usage schemes
@@ -125,9 +130,14 @@ make_persistent_array_example()
 		persistent_ptr<compound_type[]> comp; //
 	};
 
-	// create a pmemobj pool
+// create a pmemobj pool
+#ifndef _WIN32
 	auto pop = pool<root>::create("poolfile", "layout", PMEMOBJ_MIN_POOL,
 				      S_IWUSR | S_IRUSR);
+#else
+	auto pop = pool<root>::create("poolfile", "layout", PMEMOBJ_MIN_POOL,
+				      S_IWRITE | S_IREAD);
+#endif
 	auto proot = pop.get_root();
 
 	// typical usage schemes
@@ -185,9 +195,14 @@ make_persistent_atomic_example()
 		persistent_ptr<compound_type> comp; //
 	};
 
-	// create a pmemobj pool
+// create a pmemobj pool
+#ifndef _WIN32
 	auto pop = pool<root>::create("poolfile", "layout", PMEMOBJ_MIN_POOL,
 				      S_IWUSR | S_IRUSR);
+#else
+	auto pop = pool<root>::create("poolfile", "layout", PMEMOBJ_MIN_POOL,
+				      S_IWRITE | S_IREAD);
+#endif
 	auto proot = pop.get_root();
 
 	// typical usage schemes
@@ -242,9 +257,14 @@ make_persistent_array_atomic_example()
 		persistent_ptr<compound_type[]> comp; //
 	};
 
-	// create a pmemobj pool
+// create a pmemobj pool
+#ifndef _WIN32
 	auto pop = pool<root>::create("poolfile", "layout", PMEMOBJ_MIN_POOL,
 				      S_IWUSR | S_IRUSR);
+#else
+	auto pop = pool<root>::create("poolfile", "layout", PMEMOBJ_MIN_POOL,
+				      S_IWRITE | S_IREAD);
+#endif
 	auto proot = pop.get_root();
 
 	// typical usage schemes

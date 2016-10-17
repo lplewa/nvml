@@ -48,9 +48,17 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
+#ifndef _WIN32
 #include <unistd.h>
-
+#else
+#include <io.h>
+#define F_OK 0
+#endif
 #define LAYOUT "queue"
+
+#ifdef _WIN32
+#define S_IRWXU S_IREAD | S_IWRITE
+#endif
 
 namespace
 {
