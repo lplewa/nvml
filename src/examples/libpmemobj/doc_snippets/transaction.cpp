@@ -37,7 +37,7 @@
 /*
  * The following might be necessary to compile the examples on older compilers.
  */
-#if !defined(__cpp_lib_uncaught_exceptions) && !defined(_WIN32)
+#if !defined(__cpp_lib_uncaught_exceptions) || _MSC_VER < 1900
 #define __cpp_lib_uncaught_exceptions 201411
 namespace std
 {

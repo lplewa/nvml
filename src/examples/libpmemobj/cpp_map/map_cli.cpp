@@ -54,21 +54,8 @@ using nvml::obj::delete_persistent;
 using nvml::obj::pool;
 using nvml::obj::pool_base;
 
-struct foo {
-	foo(long long val) : value(val)
-	{
-	}
-
-	operator long long() const
-	{
-		return value;
-	}
-
-	long long value;
-};
-
 /* convenience typedefs */
-typedef foo value_t;
+typedef long long value_t;
 typedef uint64_t key_type;
 typedef examples::ctree_map_p<key_type, value_t> pmap;
 typedef examples::ctree_map_transient<key_type, value_t> vmap;
