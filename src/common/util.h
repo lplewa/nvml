@@ -73,6 +73,9 @@ typedef void (*Free_func)(void *ptr);
 typedef void *(*Realloc_func)(void *ptr, size_t size);
 typedef char *(*Strdup_func)(const char *s);
 
+typedef char utf8_t;
+typedef unsigned short utf16_t;
+
 extern Malloc_func Malloc;
 extern Free_func Free;
 extern Realloc_func Realloc;
@@ -88,6 +91,11 @@ char *util_realpath(const char *path);
 int util_compare_file_inodes(const char *path1, const char *path2);
 void *util_aligned_malloc(size_t alignment, size_t size);
 void util_aligned_free(void *ptr);
+
+#ifdef _WIN32
+utf8_t *util_toUTF8(const utf16_t *wstr);
+utf16_t *util_toUTF16(const utf8_t *wstr);
+#endif
 
 #define UTIL_MAX_ERR_MSG 128
 void util_strerror(int errnum, char *buff, size_t bufflen);

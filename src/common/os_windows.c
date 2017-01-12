@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2017, Intel Corporation
+ * Copyright 2017, Intel Corporation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -31,28 +31,59 @@
  */
 
 /*
- * pmem.h -- internal definitions for libpmem
+ * os_windows.c -- windows abstraction layer
  */
+#include "util.h"
+#include "os.h"
 
-#define PMEM_LOG_PREFIX "libpmem"
-#define PMEM_LOG_LEVEL_VAR "PMEM_LOG_LEVEL"
-#define PMEM_LOG_FILE_VAR "PMEM_LOG_FILE"
+/* os_open -- XXX */
+int
+os_open(const utf8_t *pathname, int flags, ...)
+{
+	utf16_t *path = util_toUTF16(pathname);
+	int ret = 0;
+	if (path == NULL) {
+		return -1;
+	}
+	/* there is no O_TMPFILE on windows */
+	if (flags & O_CREAT) {
+		va_list arg;
+		va_start(arg, flags);
+		mode_t mode = va_arg(arg, mode_t);
+		va_end(arg);
+		ret = _wopen(path, flags, mode);
+	} else {
+		ret = _wopen(path, flags);
+	}
+	free(path);
+	return ret;
+}
 
-extern unsigned long long Pagesize;
+/* os_stat -- XXX */
+int
+os_stat(const char *pathname, os_stat_t *buf)
+{
+	utf16_t *path = util_toUTF16(pathname);
+	if (path == NULL) {
+		return -1;
+	}
 
-void pmem_init(void);
+	int ret = _wstat64(path, buf);
 
-int is_pmem_proc(const void *addr, size_t len);
+	free(path);
+	return ret;
+}
 
-void *pmem_map_file(const char *path, size_t len, int flags, mode_t mode,
-		size_t *mapped_lenp, int *is_pmemp);
+/* os_unlink -- XXX */
+int
+os_unlink(const char *pathname)
+{
+	utf16_t *path = util_toUTF16(pathname);
+	if (path == NULL) {
+		return -1;
+	}
 
-
-#if defined(_WIN32) && (NTDDI_VERSION >= NTDDI_WIN10_RS1)
-typedef BOOL (WINAPI *PQVM)(
-		HANDLE, const void *,
-		enum WIN32_MEMORY_INFORMATION_CLASS, PVOID,
-		SIZE_T, PSIZE_T);
-
-extern PQVM Func_qvmi;
-#endif
+	int ret = _wunlink(path);
+	free(path);
+	return ret;
+}

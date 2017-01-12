@@ -59,6 +59,7 @@
 #include "librpmem.h"
 #include "set.h"
 #include "file.h"
+#include "os.h"
 #include "mmap.h"
 #include "util.h"
 #include "out.h"
@@ -575,8 +576,8 @@ util_poolset_chmod(struct pool_set *set, mode_t mode)
 			if (!part->created)
 				continue;
 
-			util_stat_t stbuf;
-			if (util_fstat(part->fd, &stbuf) != 0) {
+			os_stat_t stbuf;
+			if (os_fstat(part->fd, &stbuf) != 0) {
 				ERR("!fstat");
 				return -1;
 			}
@@ -897,7 +898,7 @@ util_poolset_parse(struct pool_set **setp, const char *path, int fd)
 	size_t psize;
 	FILE *fs;
 
-	if (util_lseek(fd, 0, SEEK_SET) != 0) {
+	if (os_lseek(fd, 0, SEEK_SET) != 0) {
 		ERR("!lseek %d", fd);
 		return -1;
 	}

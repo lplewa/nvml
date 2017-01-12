@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2017, Intel Corporation
+ * Copyright 2017, Intel Corporation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -31,28 +31,43 @@
  */
 
 /*
- * pmem.h -- internal definitions for libpmem
+ * os_linux.c -- Linux abstraction layer
  */
 
-#define PMEM_LOG_PREFIX "libpmem"
-#define PMEM_LOG_LEVEL_VAR "PMEM_LOG_LEVEL"
-#define PMEM_LOG_FILE_VAR "PMEM_LOG_FILE"
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <stdarg.h>
+#include <unistd.h>
 
-extern unsigned long long Pagesize;
+#include "util.h"
+#include "os.h"
 
-void pmem_init(void);
+/* os_open -- XXX */
+int
+os_open(const utf8_t *pathname, int flags, ...)
+{
+	if (flags & (O_CREAT | O_TMPFILE) {
+		va_list arg;
+		va_start(arg, flags);
+		mode_t mode = va_arg(arg, mode_t);
+		va_end(arg);
+		return open(pathname, flags, mode);
+	} else {
+		return open(pathname, flags);
+	}
+}
 
-int is_pmem_proc(const void *addr, size_t len);
+/* os_stat -- XXX */
+int
+os_stat(const char *pathname, os_stat_t *buf)
+{
+	return stat(pathname, buf);
+}
 
-void *pmem_map_file(const char *path, size_t len, int flags, mode_t mode,
-		size_t *mapped_lenp, int *is_pmemp);
-
-
-#if defined(_WIN32) && (NTDDI_VERSION >= NTDDI_WIN10_RS1)
-typedef BOOL (WINAPI *PQVM)(
-		HANDLE, const void *,
-		enum WIN32_MEMORY_INFORMATION_CLASS, PVOID,
-		SIZE_T, PSIZE_T);
-
-extern PQVM Func_qvmi;
-#endif
+/* os_unlink -- XXX */
+int
+os_unlink(const char *pathname)
+{
+	return unlink(pathname);
+}

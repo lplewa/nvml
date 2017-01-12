@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2017, Intel Corporation
+ * Copyright 2017, Intel Corporation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -31,28 +31,33 @@
  */
 
 /*
- * pmem.h -- internal definitions for libpmem
+ * os.h -- os abstaction layer
  */
 
-#define PMEM_LOG_PREFIX "libpmem"
-#define PMEM_LOG_LEVEL_VAR "PMEM_LOG_LEVEL"
-#define PMEM_LOG_FILE_VAR "PMEM_LOG_FILE"
-
-extern unsigned long long Pagesize;
-
-void pmem_init(void);
-
-int is_pmem_proc(const void *addr, size_t len);
-
-void *pmem_map_file(const char *path, size_t len, int flags, mode_t mode,
-		size_t *mapped_lenp, int *is_pmemp);
-
-
-#if defined(_WIN32) && (NTDDI_VERSION >= NTDDI_WIN10_RS1)
-typedef BOOL (WINAPI *PQVM)(
-		HANDLE, const void *,
-		enum WIN32_MEMORY_INFORMATION_CLASS, PVOID,
-		SIZE_T, PSIZE_T);
-
-extern PQVM Func_qvmi;
+#ifndef NVML_OS_H
+#define NVML_OS_H 1
+#ifdef __cplusplus
+extern "C" {
 #endif
+
+#include <sys/stat.h>
+
+#ifndef _WIN32
+typedef struct stat os_stat_t;
+#define os_fstat	fstat
+#define os_lseek	lseek
+#else
+typedef struct _stat64 os_stat_t;
+#define os_fstat	_fstat64
+#define os_lseek	_lseeki64
+#endif
+
+
+int os_open(const char *pathname, int flags, ...);
+int os_stat(const char *pathname, os_stat_t *buf);
+int os_unlink(const char *pathname);
+
+#ifdef __cplusplus
+}
+#endif
+#endif /* os.h */
