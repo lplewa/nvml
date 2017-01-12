@@ -631,18 +631,17 @@ check_open_files()
 #endif /* _WIN32 */
 
 /*
- * ut_start -- initialize unit test framework, indicate test started
+ * ut_start_common -- (internal)initialize unit test framework,
+ *		indicate test started
  */
-void
-ut_start(const char *file, int line, const char *func,
-    int argc, char * const argv[], const char *fmt, ...)
+static void
+ut_start_common(const char *file, int line, const char *func,
+    const char *fmt, va_list ap)
 {
-	va_list ap;
+
 	int saveerrno = errno;
 	char logname[MAXLOGNAME];
 	char *logsuffix;
-
-	va_start(ap, fmt);
 
 	long long sc = sysconf(_SC_PAGESIZE);
 	if (sc < 0)
@@ -705,17 +704,52 @@ ut_start(const char *file, int line, const char *func,
 	prefix(file, line, func, 0);
 	vout(OF_LOUD|OF_NAME, "START", fmt, ap);
 
+	record_open_files();
+
+	errno = saveerrno;
+}
+
+/*
+ * ut_start -- initialize unit test framework, indicate test started
+ */
+void
+ut_start(const char *file, int line, const char *func,
+	int argc, char * const argv[], const char *fmt, ...)
+{
+	va_list ap;
+	va_start(ap, fmt);
+	ut_start_common(file, line, func, fmt, ap);
 	out(OF_NONL, 0, "     args:");
 	for (int i = 0; i < argc; i++)
 		out(OF_NONL, " %s", argv[i]);
 	out(0, NULL);
 
 	va_end(ap);
-
-	record_open_files();
-
-	errno = saveerrno;
 }
+
+#ifdef _WIN32
+/*
+ * ut_startW -- initialize unit test framework, indicate test started
+ */
+void
+ut_startW(const char *file, int line, const char *func,
+	int argc, wchar_t * const argv[], const char *fmt, ...)
+{
+	va_list ap;
+	va_start(ap, fmt);
+	ut_start_common(file, line, func, fmt, ap);
+	out(OF_NONL, 0, "     args:");
+	for (int i = 0; i < argc; i++) {
+		char *str = ut_toUTF8(argv[i]);
+		UT_ASSERTne(str, NULL);
+		out(OF_NONL, " %s", str);
+		free(str);
+	}
+	out(0, NULL);
+
+	va_end(ap);
+}
+#endif
 
 /*
  * ut_done -- indicate test is done, exit program
@@ -823,3 +857,61 @@ ut_checksum(uint8_t *addr, size_t len)
 
 	return (uint16_t)(sum2 << 8) | sum1;
 }
+
+#ifdef _WIN32
+/*
+ * ut_toUTF8 -- XXX
+ */
+char *
+ut_toUTF8(const wchar_t *wstr)
+{
+	int size = WideCharToMultiByte(CP_UTF8, 0, wstr, -1,
+		NULL, 0, NULL, NULL);
+	if (size == 0) {
+		errno = EINVAL;
+		return NULL;
+	}
+
+	char *str = malloc(size * sizeof(char));
+	if (str == NULL) {
+		errno = ENOMEM;
+		return NULL;
+	}
+
+	if (WideCharToMultiByte(CP_UTF8, 0, wstr, -1, str, size,
+		NULL, NULL) == 0) {
+		free(str);
+		errno = EINVAL;
+		return NULL;
+	}
+
+	return str;
+}
+
+/*
+ * ut_toUTF16 -- XXX
+ */
+wchar_t *
+ut_toUTF16(const char *wstr)
+{
+	int size = MultiByteToWideChar(CP_UTF8, 0, wstr, -1, NULL, 0);
+	if (size == 0) {
+		errno = EINVAL;
+		return NULL;
+	}
+
+	wchar_t *str = malloc(size * sizeof(wchar_t));
+	if (str == NULL) {
+		errno = ENOMEM;
+		return NULL;
+	}
+
+	if (MultiByteToWideChar(CP_UTF8, 0, wstr, -1, str, size) == 0) {
+		free(str);
+		errno = EINVAL;
+		return NULL;
+	}
+
+	return str;
+}
+#endif

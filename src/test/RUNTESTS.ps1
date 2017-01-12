@@ -53,7 +53,7 @@ Param(
     [alias("d")]
     $dreceivetype = "auto",
     [alias("o")]
-    $time = "60s",
+    $time = "180s",
     [alias("s")]
     $testfile = "all",
     [alias("i")]
@@ -280,6 +280,7 @@ function runtest {
                         $p | Stop-Process -Force
                         Write-Error "RUNTESTS: stopping: $testName/$runscript TIMED OUT, TEST=$testtype FS=$fs BUILD=$build"
                         cd ..
+                        exit $p.ExitCode
                     }
                 } Else {
                     $p.WaitForExit()

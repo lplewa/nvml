@@ -272,7 +272,22 @@ ut_stat(const char *file, int line, const char *func, const char *path,
 
 	return retval;
 }
+#ifdef _WIN32
+/*
+ * ut_statW -- a stat that cannot return -1
+ */
+int
+ut_statW(const char *file, int line, const char *func, const wchar_t *path,
+	ut_util_stat_t *st_bufp)
+{
+	int retval = ut_util_statW(path, st_bufp);
 
+	if (retval < 0)
+		ut_fatal(file, line, func, "!stat: %S", path);
+
+	return retval;
+}
+#endif
 /*
  * ut_mmap -- a mmap call that cannot return MAP_FAILED
  */

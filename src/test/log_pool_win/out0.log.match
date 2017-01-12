@@ -1,0 +1,4 @@
+log_pool_win$(nW)TEST0: START: log_pool_win
+ $(nW)log_pool_win$(nW) c $(nW)testfile 20 0600
+$(nW)testfile: file size 20971520 usable space 20963328 mode 0600
+log_pool_win$(nW)TEST0: DONE

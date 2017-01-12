@@ -33,7 +33,7 @@
 . "..\testconfig.ps1"
 
 function touch {
-    Out-File -InputObject $null -Encoding ascii -FilePath $args[0]
+    Out-File -InputObject $null -Encoding utf8 -FilePath $args[0]
 }
 
 function epoch {
@@ -295,7 +295,7 @@ function require_pmem {
 #
 function create_poolset {
     $psfile = $args[0]
-    echo "PMEMPOOLSET" | out-file -encoding ASCII $psfile
+    echo "PMEMPOOLSET" | out-file -encoding utf8 $psfile
     for ($i=1;$i -lt $args.count;$i++) {
         if ($args[$i] -eq "M" -Or $args[$i] -eq 'm') { # remote replica
             $i++
@@ -303,11 +303,11 @@ function create_poolset {
             $fparms = ($cmd.Split("{:}"))
             $node = $fparms[0]
             $desc = $fparms[1]
-            echo "REPLICA $node $desc" | out-file -Append -encoding ASCII $psfile
+            echo "REPLICA $node $desc" | out-file -Append -encoding utf8 $psfile
             continue
         }
         if ($args[$i] -eq "R" -Or $args[$i] -eq 'r') {
-            echo "REPLICA" | out-file -Append -encoding ASCII $psfile
+            echo "REPLICA" | out-file -Append -encoding utf8 $psfile
             continue
         }
         $cmd = $args[$i]
@@ -354,7 +354,7 @@ function create_poolset {
         #     chmod $mode $fpath
         # fi
 
-        echo "$fsize $fpath" | out-file -Append -encoding ASCII $psfile
+        echo "$fsize $fpath" | out-file -Append -encoding utf8 $psfile
     } # for args
 }
 
@@ -589,7 +589,7 @@ function require_binary() {
 function convert_files_to_utf8_wo_bom {
     sv -Name files $args[0]
     foreach($file in $files) {
-        $content = Get-Content $file
+        $content = Get-Content -Encoding UTF8 $file
         $path = (Get-Item -Path ".\" -Verbose).FullName | Join-Path -ChildPath $file
         if($content -ne $null) {
             [IO.File]::WriteAllLines($path, $content)

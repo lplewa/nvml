@@ -46,6 +46,7 @@
 #include <pthread.h>
 
 #include "out.h"
+#include "os.h"
 #include "valgrind_internal.h"
 #include "util.h"
 
@@ -217,7 +218,7 @@ out_init(const char *log_prefix, const char *log_level_var,
 				log_file, getpid());
 			log_file = log_file_pid;
 		}
-		if ((Out_fp = fopen(log_file, "w")) == NULL) {
+		if ((Out_fp = os_fopen(log_file, "w")) == NULL) {
 			char buff[UTIL_MAX_ERR_MSG];
 			util_strerror(errno, buff, UTIL_MAX_ERR_MSG);
 			fprintf(stderr, "Error (%s): %s=%s: %s\n",
