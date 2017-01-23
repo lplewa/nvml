@@ -36,6 +36,7 @@
 #include "util.h"
 #include "os.h"
 
+#define UTF8_BOM "﻿"
 /* os_open -- XXX */
 int
 os_open(const utf8_t *pathname, int flags, ...)
@@ -56,8 +57,17 @@ os_open(const utf8_t *pathname, int flags, ...)
 		ret = _wopen(path, flags);
 	}
 	free(path);
+
+	if (ret != -1) {
+		char bom[3];
+		if (_read(ret, bom, 3) != 3 || memcmp(bom, UTF8_BOM, 3) != 0 )  {
+			/* UTF-8 bom not found - reset file to the beginning */
+			lseek(ret, 0, SEEK_SET);
+		}
+	}
+
 	return ret;
-}
+  }
 
 /* os_stat -- XXX */
 int
@@ -84,6 +94,77 @@ os_unlink(const char *pathname)
 	}
 
 	int ret = _wunlink(path);
+	free(path);
+	return ret;
+}
+
+int
+os_access(const char *pathname, mode_t mode)
+{
+	utf16_t *path = util_toUTF16(pathname);
+	if (path == NULL) {
+		return -1;
+	}
+
+	int ret = _waccess(path, mode);
+	free(path);
+	return ret;
+}
+
+void
+os_skipBOM(FILE *file)
+{
+	if (file == NULL)
+		return;
+	/* UTF-8 BOM + \0 */
+	char bom[4];
+	fgets(bom, 4, file);
+
+	if (strcmp(bom, UTF8_BOM) != 0) {
+		/* UTF-8 bom not found - reset file to the beginning */
+		fseek(file, 0, SEEK_SET);
+	}
+}
+
+FILE *
+os_fopen(const char *pathname, const char *mode)
+{
+	utf16_t *path = util_toUTF16(pathname);
+	if (path == NULL) {
+		return NULL;
+	}
+
+	utf16_t *wmode = util_toUTF16(mode);
+	if (path == NULL) {
+		free(path);
+		return NULL;
+	}
+
+	FILE *ret = _wfopen(path, wmode);
+
+	free(path);
+	free(wmode);
+
+	os_skipBOM(ret);
+	return ret;
+}
+
+FILE *
+os_fdopen(int fd, const char *mode)
+{
+	FILE *ret = fdopen(fd, mode);
+	os_skipBOM(ret);
+	return ret;
+}
+
+int os_chmod(const char *pathname, mode_t mode)
+{
+	utf16_t *path = util_toUTF16(pathname);
+	if (path == NULL) {
+		return -1;
+	}
+
+	int ret = _wchmod(path, mode);
 	free(path);
 	return ret;
 }

@@ -388,9 +388,9 @@ util_file_open(const char *path, size_t *size, size_t minsize, int flags)
 	int oerrno;
 	int fd;
 
-#ifdef _WIN32
+	#ifdef _WIN32
 	flags |= O_BINARY;
-#endif
+	#endif
 
 	if ((fd = os_open(path, flags)) < 0) {
 		ERR("!open %s", path);
@@ -448,7 +448,7 @@ util_unlink(const char *path)
  * On Windows we can not unlink Read-Only files
  */
 #ifdef _WIN32
-		_chmod(path, _S_IREAD | _S_IWRITE);
+		os_chmod(path, _S_IREAD | _S_IWRITE);
 #endif
 		return os_unlink(path);
 	}

@@ -65,6 +65,12 @@ extern unsigned long long Mmap_align;
 
 #define util_alignof(t) offsetof(struct {char _util_c; t _util_m; }, _util_m)
 
+#ifdef _WIN32
+#define UNICODE_FUNCTION(A) A##U
+#else
+#define UNICODE_FUNCTION(A) A
+#endif
+
 /*
  * overridable names for malloc & friends used by this library
  */

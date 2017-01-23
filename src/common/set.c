@@ -589,7 +589,7 @@ util_poolset_chmod(struct pool_set *set, mode_t mode)
 					stbuf.st_mode & ~(unsigned)S_IFMT);
 			}
 
-			if (chmod(part->path, mode)) {
+			if (os_chmod(part->path, mode)) {
 				ERR("!chmod %u/%u/%s", r, p, part->path);
 				return -1;
 			}
@@ -910,7 +910,7 @@ util_poolset_parse(struct pool_set **setp, const char *path, int fd)
 	}
 
 	/* associate a stream with the file descriptor */
-	if ((fs = fdopen(fd, "r")) == NULL) {
+	if ((fs = os_fdopen(fd, "r")) == NULL) {
 		ERR("!fdopen %d", fd);
 		close(fd);
 		return -1;
@@ -1373,7 +1373,7 @@ util_poolset_read(struct pool_set **setp, const char *path)
 	int ret = 0;
 	int fd;
 
-	if ((fd = open(path, O_RDONLY)) < 0)
+	if ((fd = os_open(path, O_RDONLY)) < 0)
 		return -1;
 
 	ret = util_poolset_parse(setp, path, fd);
@@ -2048,7 +2048,7 @@ util_pool_create_uuids(struct pool_set **setp, const char *path,
 	int oerrno;
 
 	/* check if file exists */
-	if (poolsize > 0 && access(path, F_OK) == 0) {
+	if (poolsize > 0 && os_access(path, F_OK) == 0) {
 		ERR("file %s already exists", path);
 		errno = EEXIST;
 		return -1;
@@ -2707,7 +2707,7 @@ int
 util_poolset_foreach_part(const char *path,
 	int (*cb)(struct part_file *pf, void *arg), void *arg)
 {
-	int fd = open(path, O_RDONLY);
+	int fd = os_open(path, O_RDONLY);
 	if (fd < 0)
 		return -1;
 
@@ -2756,7 +2756,7 @@ err_close:
 size_t
 util_poolset_size(const char *path)
 {
-	int fd = open(path, O_RDONLY);
+	int fd = os_open(path, O_RDONLY);
 	if (fd < 0)
 		return 0;
 

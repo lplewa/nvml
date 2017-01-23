@@ -56,6 +56,10 @@ typedef struct _stat64 os_stat_t;
 int os_open(const char *pathname, int flags, ...);
 int os_stat(const char *pathname, os_stat_t *buf);
 int os_unlink(const char *pathname);
+int os_access(const char *pathname, mode_t mode);
+FILE *os_fopen(const char *pathname, const char *mode);
+FILE *os_fdopen(int fd, const char *mode);
+int os_chmod(const char *pathname, mode_t mode);
 
 #ifdef __cplusplus
 }
