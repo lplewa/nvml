@@ -60,7 +60,7 @@ int os_access(const char *pathname, mode_t mode);
 FILE *os_fopen(const char *pathname, const char *mode);
 FILE *os_fdopen(int fd, const char *mode);
 int os_chmod(const char *pathname, mode_t mode);
-
+int os_mkstemp(char *temp);
 #ifdef __cplusplus
 }
 #endif

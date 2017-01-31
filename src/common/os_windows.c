@@ -168,3 +168,43 @@ int os_chmod(const char *pathname, mode_t mode)
 	free(path);
 	return ret;
 }
+
+/*
+ * os_mkstemp -- generate a unique temporary filename from template
+ */
+int
+os_mkstemp(char *temp)
+{
+	unsigned rnd;
+	wchar_t *_temp = util_toUTF16(temp);
+	if (_temp == NULL)
+		return -1;
+	wchar_t *path = _wmktemp(_temp);
+
+	if (path == NULL) {
+		free(_temp);
+		return -1;
+	}
+
+	wchar_t npath[MAX_PATH];
+	wcscpy(npath, path);
+
+	free(_temp);
+	/*
+	* Use rand_s to generate more unique tmp file name than _mktemp do.
+	* In case with multiple threads and multiple files even after close()
+	* file name conflicts occurred.
+	* It resolved issue with synchronous removing
+	* multiples files by system.
+	*/
+	rand_s(&rnd);
+	_snwprintf(npath + wcslen(npath), MAX_PATH, L"%d", rnd);
+
+	/*
+	* Use O_TEMPORARY flag to make sure the file is deleted when
+	* the last file descriptor is closed.  Also, it prevents opening
+	* this file from another process.
+	*/
+	return _wopen(npath, O_RDWR | O_CREAT | O_EXCL | O_TEMPORARY,
+		S_IWRITE | S_IREAD);
+}
