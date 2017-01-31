@@ -37,7 +37,10 @@
 #include "os.h"
 
 #define UTF8_BOM "﻿"
-/* os_open -- XXX */
+
+/*
+ * os_open -- open abstraction layer
+ */
 int
 os_open(const utf8_t *pathname, int flags, ...)
 {
@@ -67,9 +70,11 @@ os_open(const utf8_t *pathname, int flags, ...)
 	}
 
 	return ret;
-  }
+}
 
-/* os_stat -- XXX */
+/*
+ * os_stat -- stat abstraction layer
+ */
 int
 os_stat(const char *pathname, os_stat_t *buf)
 {
@@ -84,7 +89,9 @@ os_stat(const char *pathname, os_stat_t *buf)
 	return ret;
 }
 
-/* os_unlink -- XXX */
+/*
+ * os_unlink -- unlink abstraction layer
+ */
 int
 os_unlink(const char *pathname)
 {
@@ -98,8 +105,11 @@ os_unlink(const char *pathname)
 	return ret;
 }
 
+/*
+ * os_access -- access abstraction layer
+ */
 int
-os_access(const char *pathname, mode_t mode)
+os_access(const char *pathname, int mode)
 {
 	utf16_t *path = util_toUTF16(pathname);
 	if (path == NULL) {
@@ -111,6 +121,9 @@ os_access(const char *pathname, mode_t mode)
 	return ret;
 }
 
+/*
+ * os_skipBOM -- (internal) Skip BOM in file stream
+ */
 void
 os_skipBOM(FILE *file)
 {
@@ -126,6 +139,9 @@ os_skipBOM(FILE *file)
 	}
 }
 
+/*
+ * os_fdopen -- fdopen abstraction layer
+ */
 FILE *
 os_fopen(const char *pathname, const char *mode)
 {
@@ -149,6 +165,9 @@ os_fopen(const char *pathname, const char *mode)
 	return ret;
 }
 
+/*
+ * os_chmod -- chmod abstraction layer
+ */
 FILE *
 os_fdopen(int fd, const char *mode)
 {
@@ -157,6 +176,9 @@ os_fdopen(int fd, const char *mode)
 	return ret;
 }
 
+/*
+ * os_chmod -- chmod abstraction layer
+ */
 int os_chmod(const char *pathname, mode_t mode)
 {
 	utf16_t *path = util_toUTF16(pathname);

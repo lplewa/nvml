@@ -36,6 +36,7 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <stdlib.h>
 #include <fcntl.h>
 #include <stdarg.h>
 #include <unistd.h>
@@ -43,11 +44,13 @@
 #include "util.h"
 #include "os.h"
 
-/* os_open -- XXX */
+/*
+ * os_open -- open abstraction layer
+ */
 int
 os_open(const utf8_t *pathname, int flags, ...)
 {
-	if (flags & (O_CREAT | O_TMPFILE) {
+	if (flags & O_CREAT) {
 		va_list arg;
 		va_start(arg, flags);
 		mode_t mode = va_arg(arg, mode_t);
@@ -58,16 +61,64 @@ os_open(const utf8_t *pathname, int flags, ...)
 	}
 }
 
-/* os_stat -- XXX */
+/*
+ * os_stat -- stat abstraction layer
+ */
 int
 os_stat(const char *pathname, os_stat_t *buf)
 {
 	return stat(pathname, buf);
 }
 
-/* os_unlink -- XXX */
+/*
+ * os_unlink -- unlink abstraction layer
+ */
 int
 os_unlink(const char *pathname)
 {
 	return unlink(pathname);
+}
+
+/*
+ * os_access -- access abstraction layer
+ */
+int
+os_access(const char *pathname, int mode)
+{
+	return access(pathname, mode);
+}
+
+/*
+ * os_fopen -- fopen abstraction layer
+ */
+FILE *
+os_fopen(const char *pathname, const char *mode)
+{
+	return fopen(pathname, mode);
+}
+
+/*
+ * os_fdopen -- fdopen abstraction layer
+ */
+FILE *
+os_fdopen(int fd, const char *mode)
+{
+	return fdopen(fd, mode);
+}
+
+/*
+ * os_chmod -- chmod abstraction layer
+ */
+int os_chmod(const char *pathname, mode_t mode)
+{
+	return chmod(pathname, mode);
+}
+
+/*
+ * os_mkstemp -- mkstemp abstraction layer
+ */
+int
+os_mkstemp(char *temp)
+{
+	return mkstemp(temp);
 }
