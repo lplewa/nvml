@@ -46,59 +46,65 @@
 #define MB ((size_t)1 << 20)
 
 static void
-pool_create(const char *path, size_t poolsize, unsigned mode)
+pool_create(const wchar_t *path, size_t poolsize, unsigned mode)
 {
-	PMEMlogpool *plp = pmemlog_create(path, poolsize, mode);
+	char *_path = ut_toUTF8(path);
+	PMEMlogpool *plp = pmemlog_createW(path, poolsize, mode);
 
 	if (plp == NULL)
-		UT_OUT("!%s: pmemlog_create", path);
+		UT_OUT("!%s: pmemlog_create", _path);
 	else {
 		ut_util_stat_t stbuf;
-		STAT(path, &stbuf);
+		STATW(path, &stbuf);
 
 		UT_OUT("%s: file size %zu usable space %zu mode 0%o",
-				path, stbuf.st_size,
+			_path, stbuf.st_size,
 				pmemlog_nbyte(plp),
 				stbuf.st_mode & 0777);
 
 		pmemlog_close(plp);
 
-		int result = pmemlog_check(path);
+		int result = pmemlog_checkW(path);
 
 		if (result < 0)
-			UT_OUT("!%s: pmemlog_check", path);
+			UT_OUT("!%s: pmemlog_check", _path);
 		else if (result == 0)
-			UT_OUT("%s: pmemlog_check: not consistent", path);
+			UT_OUT("%s: pmemlog_check: not consistent", _path);
 	}
+	free(_path);
 }
 
 static void
-pool_open(const char *path)
+pool_open(const wchar_t *path)
 {
-	PMEMlogpool *plp = pmemlog_open(path);
+	char *_path = ut_toUTF8(path);
+
+	PMEMlogpool *plp = pmemlog_openW(path);
 	if (plp == NULL)
-		UT_OUT("!%s: pmemlog_open", path);
+		UT_OUT("!%s: pmemlog_open", _path);
 	else {
-		UT_OUT("%s: pmemlog_open: Success", path);
+		UT_OUT("%s: pmemlog_open: Success", _path);
 		pmemlog_close(plp);
 	}
+	free(_path);
 }
 
+
 int
-main(int argc, char *argv[])
+wmain(int argc, wchar_t *argv[])
 {
-	START(argc, argv, "log_pool");
+	WSTART(argc, argv, "log_pool_win");
 
 	if (argc < 3)
-		UT_FATAL("usage: %s op path [poolsize mode]", argv[0]);
+		UT_FATAL("usage: %s op path [poolsize mode]", ut_toUTF8(argv[0]));
 
 	size_t poolsize;
 	unsigned mode;
 
 	switch (argv[1][0]) {
 	case 'c':
-		poolsize = strtoul(argv[3], NULL, 0) * MB; /* in megabytes */
-		mode = strtoul(argv[4], NULL, 8);
+		poolsize = wcstoul(argv[3], NULL, 0) * MB; /* in megabytes */
+		mode = wcstoul(argv[4], NULL, 8);
 
 		pool_create(argv[2], poolsize, mode);
 		break;

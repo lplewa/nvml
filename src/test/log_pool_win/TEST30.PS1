@@ -32,7 +32,7 @@
 #
 
 #
-# src/test/blk_pool/TEST30 -- unit test for pmemlog_open with unicode
+# src/test/log_pool_win/TEST30 -- unit test for pmemlog_open with unicode
 #
 
 [CmdletBinding(PositionalBinding=$false)]
@@ -41,7 +41,7 @@ Param(
     $DIR = ""
     )
 
-$Env:UNITTEST_NAME = "blk_pool\TEST30"
+$Env:UNITTEST_NAME = "log_pool_win\TEST30"
 $Env:UNITTEST_NUM = "30"
 
 
@@ -58,13 +58,13 @@ setup
 # TEST30 existing file, file size >= min required size, layout matches
 #
 
-expect_normal_exit ./blk_pool$EXESUFFIX c $DIR/tesⰄfile 20 0640
+expect_normal_exit $Env:EXE_DIR\log_pool_win$Env:EXESUFFIX c $DIR/tesⰄfile 20 0640
 
 cp $DIR/tesⰄfile $DIR/testfile⮸
 
 create_poolset $DIR\$Env:POOLSET 20M:$DIR\tesⰄfile R 20M:$DIR\testfile⮸
 
-expect_normal_exit ./blk_pool$Env:EXESUFFIX o $DIR/$Env:POOLSET
+expect_normal_exit $Env:EXE_DIR\log_pool_win$Env:EXESUFFIX o $DIR/$Env:POOLSET
 
 check
 

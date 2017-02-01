@@ -29,7 +29,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-# src/test/log_pool/TEST9 -- unit test for pmemlog_create
+# src/test/log_pool_win/TEST9 -- unit test for pmemlog_create
 #
 # parameter handling
 #
@@ -38,7 +38,7 @@ Param(
     [alias("d")]
     $DIR = ""
     )
-$Env:UNITTEST_NAME = "log_pool\TEST9"
+$Env:UNITTEST_NAME = "log_pool_win\TEST9"
 $Env:UNITTEST_NUM = "9"
 
 
@@ -60,7 +60,7 @@ create_holey_file 20M $DIR\testfile
 # TEST9 existing file, file length >= min required size, poolsize == 0,
 #       (no read permissions)
 #
-expect_normal_exit $Env:EXE_DIR\log_pool$Env:EXESUFFIX c $DIR\testfile 0 0600
+expect_normal_exit $Env:EXE_DIR\log_pool_win$Env:EXESUFFIX c $DIR\testfile 0 0600
 
 # restore full permissions
 & icacls $DIR\testfile /grant ${Env:USERNAME}:F >$null

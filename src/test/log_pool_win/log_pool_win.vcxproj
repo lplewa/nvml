@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\src\test\log_pool\log_pool.c" />
+    <ClCompile Include="..\..\..\src\test\log_pool_win\log_pool_win.c" />
   </ItemGroup>
   <ItemGroup>
     <None Include="out0.log.match" />
@@ -71,9 +71,9 @@
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{3CF270CD-0F56-48E3-AD84-82F369C568BF}</ProjectGuid>
+    <ProjectGuid>{C71DAF3E-9361-4723-93E2-C475D1D0C0D0}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>log_pool</RootNamespace>
+    <RootNamespace>log_pool_win</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />

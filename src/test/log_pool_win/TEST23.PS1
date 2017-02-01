@@ -29,7 +29,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-# src/test/log_pool/TEST23 -- unit test for pmemlog_open
+# src/test/log_pool_win/TEST23 -- unit test for pmemlog_open
 #
 # parameter handling
 #
@@ -38,7 +38,7 @@ Param(
     [alias("d")]
     $DIR = ""
     )
-$Env:UNITTEST_NAME = "log_pool\TEST23"
+$Env:UNITTEST_NAME = "log_pool_win\TEST23"
 $Env:UNITTEST_NUM = "23"
 
 
@@ -57,7 +57,7 @@ create_holey_file 20M $DIR\testfile
 # TEST23 existing file, file size >= min required size
 #        (empty pool header)
 #
-expect_normal_exit $Env:EXE_DIR\log_pool$Env:EXESUFFIX o $DIR\testfile
+expect_normal_exit $Env:EXE_DIR\log_pool_win$Env:EXESUFFIX o $DIR\testfile
 
 check
 

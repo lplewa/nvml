@@ -29,7 +29,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-# src/test/log_pool/TEST7 -- unit test for pmemlog_create
+# src/test/log_pool_win/TEST7 -- unit test for pmemlog_create
 #
 # parameter handling
 #
@@ -38,7 +38,7 @@ Param(
     [alias("d")]
     $DIR = ""
     )
-$Env:UNITTEST_NAME = "log_pool\TEST7"
+$Env:UNITTEST_NAME = "log_pool_win\TEST7"
 $Env:UNITTEST_NUM = "7"
 
 
@@ -57,7 +57,7 @@ create_nonzeroed_file 2M 8K $DIR\testfile
 # TEST7 existing file, file length >= min required size, poolsize == 0
 #       (file contains garbage, except for header)
 #
-expect_normal_exit $Env:EXE_DIR\log_pool$Env:EXESUFFIX c $DIR\testfile 0 0600
+expect_normal_exit $Env:EXE_DIR\log_pool_win$Env:EXESUFFIX c $DIR\testfile 0 0600
 
 check_files $DIR\testfile
 

@@ -393,8 +393,8 @@ err:
  * pmemblk_create -- create a block memory pool
  */
 PMEMblkpool *
-UNICODE_FUNCTION(pmemblk_create)(const char *path, size_t bsize, size_t poolsize,
-		mode_t mode)
+UNICODE_FUNCTION(pmemblk_create)(const char *path, size_t bsize,
+		size_t poolsize, mode_t mode)
 {
 	LOG(3, "path %s bsize %zu poolsize %zu mode %o",
 			path, bsize, poolsize, mode);

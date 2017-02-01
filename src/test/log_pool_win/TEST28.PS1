@@ -29,7 +29,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-# src/test/log_pool/TEST28 -- unit test for pmemlog_open
+# src/test/log_pool_win/TEST28 -- unit test for pmemlog_open
 #
 # parameter handling
 #
@@ -38,7 +38,7 @@ Param(
     [alias("d")]
     $DIR = ""
     )
-$Env:UNITTEST_NAME = "log_pool\TEST28"
+$Env:UNITTEST_NAME = "log_pool_win\TEST28"
 $Env:UNITTEST_NUM = "28"
 
 
@@ -54,7 +54,7 @@ setup
 #
 # TEST28 existing file, file size >= min required size
 #
-expect_normal_exit $Env:EXE_DIR\log_pool$Env:EXESUFFIX c $DIR\testfile1 20 0600
+expect_normal_exit $Env:EXE_DIR\log_pool_win$Env:EXESUFFIX c $DIR\testfile1 20 0600
 
 cp $DIR\testfile1 $DIR\testfile2
 
@@ -74,7 +74,7 @@ cp $DIR\testfile1 $DIR\testfile2
 
 create_poolset $DIR\testset 20M:$DIR\testfile1 R 20M:$DIR\testfile2
 
-expect_normal_exit $Env:EXE_DIR\log_pool$Env:EXESUFFIX o $DIR\testset
+expect_normal_exit $Env:EXE_DIR\log_pool_win$Env:EXESUFFIX o $DIR\testset
 
 check
 
