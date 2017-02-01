@@ -60,7 +60,8 @@ os_open(const utf8_t *pathname, int flags, ...)
 		ret = _wopen(path, flags);
 	}
 	free(path);
-
+	/* BOM skipping should not modify errno */
+	int orig_errno = errno;
 	if (ret != -1) {
 		char bom[3];
 		if (_read(ret, bom, 3) != 3 || memcmp(bom, UTF8_BOM, 3) != 0 )  {
@@ -68,7 +69,7 @@ os_open(const utf8_t *pathname, int flags, ...)
 			lseek(ret, 0, SEEK_SET);
 		}
 	}
-
+	errno = orig_errno;
 	return ret;
 }
 
@@ -129,6 +130,8 @@ os_skipBOM(FILE *file)
 {
 	if (file == NULL)
 		return;
+	/* BOM skipping should not modify errno */
+	int orig_errno = errno;
 	/* UTF-8 BOM + \0 */
 	char bom[4];
 	fgets(bom, 4, file);
@@ -137,6 +140,7 @@ os_skipBOM(FILE *file)
 		/* UTF-8 bom not found - reset file to the beginning */
 		fseek(file, 0, SEEK_SET);
 	}
+	errno = orig_errno;
 }
 
 /*
