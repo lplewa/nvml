@@ -69,7 +69,7 @@ os_open(const utf8_t *pathname, int flags, ...)
 	int orig_errno = errno;
 	if (ret != -1) {
 		char bom[3];
-		if (_read(ret, bom, 3) != 3 || memcmp(bom, UTF8_BOM, 3) != 0 )  {
+		if (_read(ret, bom, 3) != 3 || memcmp(bom, UTF8_BOM, 3) != 0) {
 			/* UTF-8 bom not found - reset file to the beginning */
 			lseek(ret, 0, SEEK_SET);
 		}
@@ -188,7 +188,8 @@ os_fdopen(int fd, const char *mode)
 /*
  * os_chmod -- chmod abstraction layer
  */
-int os_chmod(const char *pathname, mode_t mode)
+int
+os_chmod(const char *pathname, mode_t mode)
 {
 	utf16_t *path = util_toUTF16(pathname);
 	if (path == NULL) {
@@ -222,20 +223,20 @@ os_mkstemp(char *temp)
 
 	free(_temp);
 	/*
-	* Use rand_s to generate more unique tmp file name than _mktemp do.
-	* In case with multiple threads and multiple files even after close()
-	* file name conflicts occurred.
-	* It resolved issue with synchronous removing
-	* multiples files by system.
-	*/
+	 * Use rand_s to generate more unique tmp file name than _mktemp do.
+	 * In case with multiple threads and multiple files even after close()
+	 * file name conflicts occurred.
+	 * It resolved issue with synchronous removing
+	 * multiples files by system.
+	 */
 	rand_s(&rnd);
 	_snwprintf(npath + wcslen(npath), MAX_PATH, L"%d", rnd);
 
 	/*
-	* Use O_TEMPORARY flag to make sure the file is deleted when
-	* the last file descriptor is closed.  Also, it prevents opening
-	* this file from another process.
-	*/
+	 * Use O_TEMPORARY flag to make sure the file is deleted when
+	 * the last file descriptor is closed.  Also, it prevents opening
+	 * this file from another process.
+	 */
 	return _wopen(npath, O_RDWR | O_CREAT | O_EXCL | O_TEMPORARY,
 		S_IWRITE | S_IREAD);
 }

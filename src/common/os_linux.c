@@ -109,7 +109,8 @@ os_fdopen(int fd, const char *mode)
 /*
  * os_chmod -- chmod abstraction layer
  */
-int os_chmod(const char *pathname, mode_t mode)
+int
+os_chmod(const char *pathname, mode_t mode)
 {
 	return chmod(pathname, mode);
 }

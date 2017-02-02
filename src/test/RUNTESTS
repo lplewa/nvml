@@ -237,7 +237,7 @@ read_global_test_configuration() {
 	[ -n "$CONF_GLOBAL_RPMEM_VALGRIND" ] && global_req_rpmem_valgrind=$CONF_GLOBAL_RPMEM_VALGRIND
 	[ -n "$CONF_GLOBAL_TIMEOUT" ] && global_req_timeout=$CONF_GLOBAL_TIMEOUT
 	[ -n "$CONF_GLOBAL_ENCODING" ] && global_req_encoding=$CONF_GLOBAL_ENCODING
-	
+
 	# dynamically declare global_req_##<encoding_name>_suffix variables
 	declare_encoding_suffixes "$global_req_encoding"
 

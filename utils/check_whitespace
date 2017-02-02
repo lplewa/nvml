@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# Copyright 2015-2016, Intel Corporation
+# Copyright 2015-2017, Intel Corporation
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -57,7 +57,7 @@ my $Errcount = 0;
 # err -- emit error, keep total error count
 #
 sub err {
-	warn "$Me: ERROR: ", @_, "\n";
+        warn @_, "\n";
 	$Errcount++;
 }
 
@@ -72,26 +72,27 @@ sub check_whitespace {
 
 	my $line = 0;
 	my $eol;
-	my $nf = 0;
+        my $nf = 0;
+        my $string;
 	while (<$fh>) {
-		$line++;
-		$eol = /\n/s;
-		if (/^\.nf$/) {
-			err("$full: $line: nested .nf") if $nf;
+                $line++;
+                $eol = /[\n\0]/s;
+                if (/^\.nf$/) {
+                        err("$full:$line: nested .nf") if $nf;
 			$nf = 1;
 		} elsif (/^\.fi$/) {
 			$nf = 0;
 		} elsif ($nf == 0) {
 			chomp;
-			err("$full: $line: trailing whitespace") if /\s$/;
-			err("$full: $line: spaces before tabs") if / \t/;
+                        err("$full:$line: trailing whitespace") if /\s$/;
+                        err("$full:$line: spaces before tabs") if / \t/;
 		}
 	}
 
 	close($fh);
 
-	err("$full: $line: .nf without .fi") if $nf;
-	err("$full: noeol") unless $eol;
+        err("$full:$line: .nf without .fi") if $nf;
+        err("$full:$line: noeol") unless $eol;
 }
 
 sub check_whitespace_with_exc {

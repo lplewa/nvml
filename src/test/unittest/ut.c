@@ -631,9 +631,10 @@ check_open_files()
 #endif /* _WIN32 */
 
 /*
- * ut_start -- initialize unit test framework, indicate test started
+ * ut_start_common -- (internal)initialize unit test framework,
+ *		indicate test started
  */
-void
+static void
 ut_start_common(const char *file, int line, const char *func,
     const char *fmt, va_list ap)
 {
@@ -722,8 +723,9 @@ ut_start(const char *file, int line, const char *func,
 	va_end(ap);
 }
 
+#ifdef _WIN32
 /*
- * ut_start -- initialize unit test framework, indicate test started
+ * ut_startW -- initialize unit test framework, indicate test started
  */
 void
 ut_startW(const char *file, int line, const char *func,
@@ -743,6 +745,8 @@ ut_startW(const char *file, int line, const char *func,
 
 	va_end(ap);
 }
+#endif
+
 /*
  * ut_done -- indicate test is done, exit program
  */
@@ -850,9 +854,10 @@ ut_checksum(uint8_t *addr, size_t len)
 	return (uint16_t)(sum2 << 8) | sum1;
 }
 
+#ifdef _WIN32
 /*
-* ut_toUTF8 -- XXX
-*/
+ * ut_toUTF8 -- XXX
+ */
 char *
 ut_toUTF8(const wchar_t *wstr)
 {
@@ -880,8 +885,8 @@ ut_toUTF8(const wchar_t *wstr)
 }
 
 /*
-* ut_toUTF16 -- XXX
-*/
+ * ut_toUTF16 -- XXX
+ */
 wchar_t *
 ut_toUTF16(const char *wstr)
 {
@@ -905,3 +910,4 @@ ut_toUTF16(const char *wstr)
 
 	return str;
 }
+#endif
