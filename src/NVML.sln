@@ -741,6 +741,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "blk_pool_win", "test\blk_po
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "log_pool_win", "test\log_pool_win\log_pool_win.vcxproj", "{C71DAF3E-9361-4723-93E2-C475D1D0C0D0}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "obj_pool_win", "test\obj_pool_win\obj_pool_win.vcxproj", "{B775480C-5B32-4F64-B026-47367280EC56}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -1652,6 +1654,10 @@ Global
 		{C71DAF3E-9361-4723-93E2-C475D1D0C0D0}.Debug|x64.Build.0 = Debug|x64
 		{C71DAF3E-9361-4723-93E2-C475D1D0C0D0}.Release|x64.ActiveCfg = Release|x64
 		{C71DAF3E-9361-4723-93E2-C475D1D0C0D0}.Release|x64.Build.0 = Release|x64
+		{B775480C-5B32-4F64-B026-47367280EC56}.Debug|x64.ActiveCfg = Debug|x64
+		{B775480C-5B32-4F64-B026-47367280EC56}.Debug|x64.Build.0 = Debug|x64
+		{B775480C-5B32-4F64-B026-47367280EC56}.Release|x64.ActiveCfg = Release|x64
+		{B775480C-5B32-4F64-B026-47367280EC56}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1902,5 +1908,6 @@ Global
 		{FF6E5B0C-DC00-4C93-B9C2-63D1E858BA79} = {746BA101-5C93-42A5-AC7A-64DCEB186572}
 		{80AF1B7D-B8CE-4AF0-AE3B-1DABED1B57E7} = {746BA101-5C93-42A5-AC7A-64DCEB186572}
 		{C71DAF3E-9361-4723-93E2-C475D1D0C0D0} = {746BA101-5C93-42A5-AC7A-64DCEB186572}
+		{B775480C-5B32-4F64-B026-47367280EC56} = {746BA101-5C93-42A5-AC7A-64DCEB186572}
 	EndGlobalSection
 EndGlobal

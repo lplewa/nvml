@@ -205,7 +205,6 @@ int
 wmain(int argc, const wchar_t *argv[])
 {
 	if (argc < 2) {
-
 		fwprintf(stderr, L"Usage: %s filename len\n", argv[0]);
 		exit(1);
 	}

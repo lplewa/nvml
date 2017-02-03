@@ -1050,8 +1050,8 @@ pmemobj_runtime_init(PMEMobjpool *pop, int rdonly, int boot, unsigned nlanes)
  * pmemobj_create -- create a transactional memory pool (set)
  */
 PMEMobjpool *
-UNICODE_FUNCTION(pmemobj_create)(const char *path, const char *layout, size_t poolsize,
-		mode_t mode)
+UNICODE_FUNCTION(pmemobj_create)(const char *path, const char *layout,
+		size_t poolsize, mode_t mode)
 {
 	LOG(3, "path %s layout %s poolsize %zu mode %o",
 			path, layout, poolsize, mode);
@@ -1151,15 +1151,25 @@ err:
  * pmemobj_createW -- create a transactional memory pool (set)
  */
 PMEMobjpool *
-pmemobj_createW(const wchar_t *path, const char *layout, size_t poolsize,
-	mode_t mode) {
-
+pmemobj_createW(const wchar_t *path, const wchar_t *layout, size_t poolsize,
+	mode_t mode)
+{
 	char *_path = util_toUTF8(path);
 	if (_path == NULL)
 		return NULL;
+	char *_layout = NULL;
+	if (layout != NULL) {
+		_layout = util_toUTF8(layout);
+		if (_layout == NULL) {
+			free(_path);
+			return NULL;
+		}
+	}
+	PMEMobjpool *ret = pmemobj_createU(_path, _layout, poolsize, mode);
 
-	PMEMobjpool *ret = pmemobj_createU(_path, layout, Open_cow, 1);
 	free(_path);
+	if (layout != NULL)
+		free(_layout);
 	return ret;
 }
 
@@ -1509,14 +1519,25 @@ UNICODE_FUNCTION(pmemobj_open)(const char *path, const char *layout)
  * pmemobj_open -- open a transactional memory pool
  */
 PMEMobjpool *
-pmemobj_openW(const wchar_t *path, const char *layout)
+pmemobj_openW(const wchar_t *path, const wchar_t *layout)
 {
 	char *_path = util_toUTF8(path);
 	if (_path == NULL)
 		return NULL;
 
-	PMEMobjpool *ret = pmemobj_open_common(_path, layout, Open_cow, 1);
+	char *_layout = NULL;
+	if (layout != NULL) {
+		_layout = util_toUTF8(layout);
+		if (_layout == NULL) {
+			free(_path);
+			return NULL;
+		}
+	}
+
+	PMEMobjpool *ret = pmemobj_open(_path, _layout);
 	free(_path);
+	if (layout != NULL)
+		free(_layout);
 	return ret;
 }
 
@@ -1648,14 +1669,26 @@ UNICODE_FUNCTION(pmemobj_check)(const char *path, const char *layout)
  * pmemobj_checkW -- transactional memory pool consistency check
  */
 int
-pmemobj_checkW(const wchar_t *path, const char *layout)
+pmemobj_checkW(const wchar_t *path, const wchar_t *layout)
 {
 	char *_path = util_toUTF8(path);
 	if (_path == NULL)
 		return -1;
 
-	int ret = pmemobj_checkU(_path, layout);
+	char *_layout = NULL;
+	if (layout != NULL) {
+		_layout = util_toUTF8(layout);
+		if (_layout == NULL) {
+			free(_path);
+			return -1;
+		}
+	}
+
+	int ret = pmemobj_checkU(_path, _layout);
+
 	free(_path);
+	if (layout != NULL)
+		free(_layout);
 	return ret;
 }
 

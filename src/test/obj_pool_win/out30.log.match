@@ -1,0 +1,4 @@
+obj_pool_win$(nW)TEST30: START: obj_pool_win
+ $(nW)obj_pool_win$(nW) o $(nW)ㅹestㆅile t㈸st
+$(nW)ㅹestㆅile: pmemobj_open: Success
+obj_pool_win$(nW)TEST30: Done

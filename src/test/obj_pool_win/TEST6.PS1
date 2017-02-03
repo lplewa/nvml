@@ -1,5 +1,5 @@
 #
-# Copyright 2017, Intel Corporation
+# Copyright 2015-2017, Intel Corporation
 # Copyright (c) 2016, Microsoft Corporation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -32,16 +32,16 @@
 #
 
 #
-# src/test/obj_pool/TEST15 -- unit test for pmemobj_create with unicode
+# src/test/obj_pool_win/TEST6 -- unit test for pmemobj_create
 #
-
 [CmdletBinding(PositionalBinding=$false)]
 Param(
     [alias("d")]
     $DIR = ""
     )
-$Env:UNITTEST_NAME = "obj_pool\TEST15"
-$Env:UNITTEST_NUM = "15"
+
+$Env:UNITTEST_NAME = "obj_pool_win\TEST6"
+$Env:UNITTEST_NUM = "6"
 
 
 # standard unit test setup
@@ -51,12 +51,20 @@ require_test_type medium
 
 setup
 
-#
-# TEST0 non-existing file, poolsize > 0
-#
-expect_normal_exit $Env:EXE_DIR\obj_pool$Env:EXESUFFIX c $DIR\ㅹestㆅile "⿆⾨ㆦt" 20 0600
+echo $null >> $DIR\testfile
 
-check_files $DIR\ㅹestㆅile
+#
+# TEST6 existing file, file length < min required size, poolsize == 0,
+#       layout string is too long
+
+# /dev/urandom is not implemented yet in windows
+# $ENV:LAYOUT = "dd if=/dev/urandom bs=1 count=768 2>/dev/null | base64 -w 0"
+$LAYOUT = "x" * 1025
+
+expect_normal_exit $Env:EXE_DIR\obj_pool_win$Env:EXESUFFIX `
+    c $DIR\testfile $LAYOUT 0 0640
+
+check_files $DIR\testfile
 
 check
 

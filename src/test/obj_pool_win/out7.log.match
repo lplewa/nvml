@@ -1,0 +1,4 @@
+obj_pool_win$(nW)TEST7: START: obj_pool_win
+ $(nW)obj_pool_win$(nW) c $(nW)testfile test 0 0640
+$(nW)testfile: pmemobj_create: File exists
+obj_pool_win$(nW)TEST7: Done

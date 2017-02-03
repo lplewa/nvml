@@ -61,10 +61,10 @@ extern "C" {
 #define pmemobj_create pmemobj_createU
 #define pmemobj_check pmemobj_checkU
 #endif
-PMEMobjpool *pmemobj_openW(const wchar_t *path, const char *layout);
-PMEMobjpool *pmemobj_createW(const wchar_t *path, const char *layout,
+PMEMobjpool *pmemobj_openW(const wchar_t *path, const wchar_t *layout);
+PMEMobjpool *pmemobj_createW(const wchar_t *path, const wchar_t *layout,
 	size_t poolsize, mode_t mode);
-int pmemobj_checkW(const wchar_t *path, const char *layout);
+int pmemobj_checkW(const wchar_t *path, const wchar_t *layout);
 
 PMEMobjpool *pmemobj_openU(const char *path, const char *layout);
 PMEMobjpool *pmemobj_createU(const char *path, const char *layout,

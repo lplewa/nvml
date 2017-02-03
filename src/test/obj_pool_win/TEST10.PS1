@@ -1,5 +1,5 @@
 #
-# Copyright 2017, Intel Corporation
+# Copyright 2015-2017, Intel Corporation
 # Copyright (c) 2016, Microsoft Corporation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -32,17 +32,16 @@
 #
 
 #
-# src/test/obj_pool/TEST30 -- unit test for pmemobj_open with unicode
+# src/test/obj_pool_win/TEST10 -- unit test for pmemobj_create
 #
-
 [CmdletBinding(PositionalBinding=$false)]
 Param(
     [alias("d")]
     $DIR = ""
     )
 
-$Env:UNITTEST_NAME = "obj_pool\TEST30"
-$Env:UNITTEST_NUM = "30"
+$Env:UNITTEST_NAME = "obj_pool_win\TEST10"
+$Env:UNITTEST_NUM = "10"
 
 
 # standard unit test setup
@@ -52,15 +51,19 @@ require_test_type medium
 
 setup
 
-#
-# TEST30 existing file, file size >= min required size, layout matches
-#
+create_holey_file 20M $DIR\testfile
+# XXX Doesn't change outcome whether we make it WO or not,
+# same goes for linux test
+& icacls $DIR\testfile /grant ${Env:USERNAME}:W >$null
 
-expect_normal_exit $Env:EXE_DIR\obj_pool$Env:EXESUFFIX `
-	c $DIR/ㅹestㆅile "t㈸st" 20 0640
+#
+# TEST10 existing file, file length >= min required size, poolsize > 0
+#        (no read permissions)
+#
+expect_normal_exit $Env:EXE_DIR\obj_pool_win$Env:EXESUFFIX `
+    c $DIR\testfile "test" 20 0640
 
-expect_normal_exit $Env:EXE_DIR\obj_pool$Env:EXESUFFIX `
-	o $DIR/ㅹestㆅile "t㈸st"
+check_files $DIR\testfile
 
 check
 
