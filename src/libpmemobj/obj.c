@@ -1050,7 +1050,7 @@ pmemobj_runtime_init(PMEMobjpool *pop, int rdonly, int boot, unsigned nlanes)
  * pmemobj_create -- create a transactional memory pool (set)
  */
 PMEMobjpool *
-pmemobj_create(const char *path, const char *layout, size_t poolsize,
+UNICODE_FUNCTION(pmemobj_create)(const char *path, const char *layout, size_t poolsize,
 		mode_t mode)
 {
 	LOG(3, "path %s layout %s poolsize %zu mode %o",
@@ -1145,6 +1145,22 @@ err:
 	util_poolset_close(set, 1);
 	errno = oerrno;
 	return NULL;
+}
+
+/*
+ * pmemobj_createW -- create a transactional memory pool (set)
+ */
+PMEMobjpool *
+pmemobj_createW(const wchar_t *path, const char *layout, size_t poolsize,
+	mode_t mode) {
+
+	char *_path = util_toUTF8(path);
+	if (_path == NULL)
+		return NULL;
+
+	PMEMobjpool *ret = pmemobj_createU(_path, layout, Open_cow, 1);
+	free(_path);
+	return ret;
 }
 
 /*
@@ -1483,12 +1499,27 @@ replicas_init:
  * pmemobj_open -- open a transactional memory pool
  */
 PMEMobjpool *
-pmemobj_open(const char *path, const char *layout)
+UNICODE_FUNCTION(pmemobj_open)(const char *path, const char *layout)
 {
 	LOG(3, "path %s layout %s", path, layout);
 
 	return pmemobj_open_common(path, layout, Open_cow, 1);
 }
+/*
+ * pmemobj_open -- open a transactional memory pool
+ */
+PMEMobjpool *
+pmemobj_openW(const wchar_t *path, const char *layout)
+{
+	char *_path = util_toUTF8(path);
+	if (_path == NULL)
+		return NULL;
+
+	PMEMobjpool *ret = pmemobj_open_common(_path, layout, Open_cow, 1);
+	free(_path);
+	return ret;
+}
+
 
 /*
  * obj_replicas_cleanup -- (internal) free resources allocated for replicas
@@ -1577,7 +1608,7 @@ pmemobj_close(PMEMobjpool *pop)
  * pmemobj_check -- transactional memory pool consistency check
  */
 int
-pmemobj_check(const char *path, const char *layout)
+UNICODE_FUNCTION(pmemobj_check)(const char *path, const char *layout)
 {
 	LOG(3, "path %s layout %s", path, layout);
 
@@ -1611,6 +1642,21 @@ pmemobj_check(const char *path, const char *layout)
 		LOG(4, "pool consistency check OK");
 
 	return consistent;
+}
+
+/*
+ * pmemobj_checkW -- transactional memory pool consistency check
+ */
+int
+pmemobj_checkW(const wchar_t *path, const char *layout)
+{
+	char *_path = util_toUTF8(path);
+	if (_path == NULL)
+		return -1;
+
+	int ret = pmemobj_checkU(_path, layout);
+	free(_path);
+	return ret;
 }
 
 /*
