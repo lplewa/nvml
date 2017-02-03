@@ -1,5 +1,5 @@
 #
-# Copyright 2017, Intel Corporation
+# Copyright 2015-2017, Intel Corporation
 # Copyright (c) 2016, Microsoft Corporation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -32,17 +32,16 @@
 #
 
 #
-# src/test/obj_pool/TEST31 -- unit test for pmemobj_open with unicode
+# src/test/obj_pool_win/TEST22 -- unit test for pmemobj_open
 #
-
 [CmdletBinding(PositionalBinding=$false)]
 Param(
     [alias("d")]
     $DIR = ""
     )
 
-$Env:UNITTEST_NAME = "obj_pool\TEST31"
-$Env:UNITTEST_NUM = "31"
+$Env:UNITTEST_NAME = "obj_pool_win\TEST22"
+$Env:UNITTEST_NUM = "22"
 
 
 # standard unit test setup
@@ -50,23 +49,18 @@ $Env:UNITTEST_NUM = "31"
 
 require_test_type medium
 
-$Env:POOLSET="testsetㅓㅹ"
-$Env:LAYOUT="⮓ⱙ"
-
 setup
 
 #
-# TEST30 existing file, file size >= min required size, layout matches
+# TEST22 existing file, file size < min required size, layout is NULL
+#        (valid pool header)
 #
+expect_normal_exit $Env:EXE_DIR\obj_pool_win$Env:EXESUFFIX `
+    c $DIR/testfile NULL 20 0640
+truncate -s 1M $DIR\testfile
 
-create_poolset $DIR\$Env:POOLSET 8M:$DIR\tesⰄfile:z 8M:$DIR\testfile⮸:z `
-	r 24M:$DIR\testfileⰊ:z r 8M:$DIR\testfile⮌:z 8M:$DIR\testfile⭙:z
-
-expect_normal_exit $Env:PMEMPOOL$Env:EXESUFFIX create --layout=$Env:LAYOUT obj `
-	$DIR/$Env:POOLSET
-
-expect_normal_exit $Env:EXE_DIR\obj_pool$Env:EXESUFFIX `
-	o $DIR/$Env:POOLSET $Env:LAYOUT
+expect_normal_exit $Env:EXE_DIR\obj_pool_win$Env:EXESUFFIX `
+    o $DIR/testfile NULL
 
 check
 

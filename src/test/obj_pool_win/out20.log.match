@@ -1,0 +1,4 @@
+obj_pool_win$(nW)TEST20: START: obj_pool_win
+ $(nW)obj_pool_win$(nW) o $(nW)testfile NULL
+$(nW)testfile: pmemobj_open: No such file or directory
+obj_pool_win$(nW)TEST20: Done

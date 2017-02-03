@@ -31,9 +31,9 @@
  */
 
 /*
- * log_pool.c -- unit test for pmemlog_create() and pmemlog_open()
+ * obj_pool.c -- unit test for pmemobj_create() and pmemobj_open()
  *
- * usage: log_pool op path [poolsize mode]
+ * usage: obj_pool op path layout [poolsize mode]
  *
  * op can be:
  *   c - create
@@ -46,72 +46,75 @@
 #define MB ((size_t)1 << 20)
 
 static void
-pool_create(const wchar_t *path, size_t poolsize, unsigned mode)
+pool_create(const wchar_t *path, const wchar_t *layout, size_t poolsize,
+	unsigned mode)
 {
 	char *_path = ut_toUTF8(path);
-	PMEMlogpool *plp = pmemlog_createW(path, poolsize, mode);
 
-	if (plp == NULL)
-		UT_OUT("!%s: pmemlog_create", _path);
+	PMEMobjpool *pop = pmemobj_createW(path, layout, poolsize, mode);
+
+	if (pop == NULL)
+		UT_OUT("!%s: pmemobj_create", _path);
 	else {
 		ut_util_stat_t stbuf;
 		STATW(path, &stbuf);
 
-		UT_OUT("%s: file size %zu usable space %zu mode 0%o",
+		UT_OUT("%s: file size %zu mode 0%o",
 			_path, stbuf.st_size,
-				pmemlog_nbyte(plp),
 				stbuf.st_mode & 0777);
 
-		pmemlog_close(plp);
+		pmemobj_close(pop);
 
-		int result = pmemlog_checkW(path);
+		int result = pmemobj_checkW(path, layout);
 
 		if (result < 0)
-			UT_OUT("!%s: pmemlog_check", _path);
+			UT_OUT("!%s: pmemobj_check", _path);
 		else if (result == 0)
-			UT_OUT("%s: pmemlog_check: not consistent", _path);
+			UT_OUT("%s: pmemobj_check: not consistent", _path);
 	}
-	free(_path);
 }
 
 static void
-pool_open(const wchar_t *path)
+pool_open(const wchar_t *path, const wchar_t *layout)
 {
 	char *_path = ut_toUTF8(path);
-
-	PMEMlogpool *plp = pmemlog_openW(path);
-	if (plp == NULL)
-		UT_OUT("!%s: pmemlog_open", _path);
-	else {
-		UT_OUT("%s: pmemlog_open: Success", _path);
-		pmemlog_close(plp);
+	PMEMobjpool *pop = pmemobj_openW(path, layout);
+	if (pop == NULL) {
+		UT_OUT("!%s: pmemobj_open", _path);
+	} else {
+		UT_OUT("%s: pmemobj_open: Success", _path);
+		pmemobj_close(pop);
 	}
-	free(_path);
 }
-
 
 int
 wmain(int argc, wchar_t *argv[])
 {
-	WSTART(argc, argv, "log_pool_win");
-
-	if (argc < 3)
-		UT_FATAL("usage: %s op path [poolsize mode]",
+	WSTART(argc, argv, "obj_pool_win");
+//	__debugbreak();
+	if (argc < 4)
+		UT_FATAL("usage: %s op path layout [poolsize mode]",
 			ut_toUTF8(argv[0]));
 
+	wchar_t *layout = NULL;
 	size_t poolsize;
 	unsigned mode;
 
+	if (wcscmp(argv[3], L"EMPTY") == 0)
+		layout = L"";
+	else if (wcscmp(argv[3], L"NULL") != 0)
+		layout = argv[3];
+
 	switch (argv[1][0]) {
 	case 'c':
-		poolsize = wcstoul(argv[3], NULL, 0) * MB; /* in megabytes */
-		mode = wcstoul(argv[4], NULL, 8);
+		poolsize = wcstoul(argv[4], NULL, 0) * MB; /* in megabytes */
+		mode = wcstoul(argv[5], NULL, 8);
 
-		pool_create(argv[2], poolsize, mode);
+		pool_create(argv[2], layout, poolsize, mode);
 		break;
 
 	case 'o':
-		pool_open(argv[2]);
+		pool_open(argv[2], layout);
 		break;
 
 	default:
