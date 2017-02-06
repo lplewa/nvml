@@ -72,8 +72,8 @@ use strict;
 use Getopt::Std;
 select STDERR;
 use v5.16;
-# Files opened without an encoding argument will be in UTF-8
-use open qw(:std :utf8);
+binmode(STDOUT, ":utf8");
+binmode(STDERR, ":utf8");
 
 my $Me = $0;
 $Me =~ s,.*/,,;
@@ -106,12 +106,12 @@ if ($opt_a) {
 	closedir(DIR);
 	die "no files found to process\n" unless @matchfiles;
 	foreach my $mfile (@matchfiles)  {
-		die "$mfile: $!\n" unless open(F, $mfile);
+		die "$mfile: $!\n" unless open(F, "<:encoding(utf8)", $mfile);
 		close(F);
 		my $ofile = $mfile;
 		$ofile =~ s/\.match$//;
 		die "$mfile found but cannot open $ofile: $!\n"
-			unless open(F, $ofile);
+			unless open(F, "<:encoding(utf8)", $ofile);
 		close(F);
 		$match2file{$mfile} = $ofile;
 	}
@@ -124,9 +124,9 @@ if ($opt_a) {
 		my $ofile = $mfile;
 		usage("$mfile: not a .match file") unless
 			$ofile =~ s/\.match$//;
-		usage("$mfile: $!") unless open(F, $mfile);
+		usage("$mfile: $!") unless open(F, "<:encoding(utf8)", $mfile);
 		close(F);
-		usage("$ofile: $!") unless open(F, $ofile);
+		usage("$ofile: $!") unless open(F, "<:encoding(utf8)", $ofile);
 		close(F);
 		$match2file{$mfile} = $ofile;
 	}
@@ -156,7 +156,7 @@ sub match {
 	my $line_out = 0;
 	my $opt = 0;
 
-	open(F, $mfile) or die "$mfile: $!\n";
+	open(F, "<:encoding(utf8)", $mfile) or die "$mfile: $!\n";
 	while (<F>) {
 		$pat = $_;
 		$line_pat++;
@@ -226,7 +226,7 @@ sub snarf {
 	local $/;
 	my $contents;
 
-	open(R, $fname) or die "$fname: $!\n";
+	open(R, "<:encoding(utf8)", $fname) or die "$fname: $!\n";
 	$contents = <R>;
 	close(R);
 

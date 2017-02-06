@@ -1050,8 +1050,8 @@ pmemobj_runtime_init(PMEMobjpool *pop, int rdonly, int boot, unsigned nlanes)
  * pmemobj_create -- create a transactional memory pool (set)
  */
 PMEMobjpool *
-UNICODE_FUNCTION(pmemobj_create)(const char *path, const char *layout, size_t poolsize,
-		mode_t mode)
+UNICODE_FUNCTION(pmemobj_create)(const char *path, const char *layout,
+		size_t poolsize, mode_t mode)
 {
 	LOG(3, "path %s layout %s poolsize %zu mode %o",
 			path, layout, poolsize, mode);
@@ -1147,6 +1147,7 @@ err:
 	return NULL;
 }
 
+#ifdef _WIN32
 /*
  * pmemobj_createW -- create a transactional memory pool (set)
  */
@@ -1172,6 +1173,7 @@ pmemobj_createW(const wchar_t *path, const wchar_t *layout, size_t poolsize,
 		free(_layout);
 	return ret;
 }
+#endif
 
 /*
  * pmemobj_check_basic_local -- (internal) basic pool consistency check
@@ -1515,6 +1517,8 @@ UNICODE_FUNCTION(pmemobj_open)(const char *path, const char *layout)
 
 	return pmemobj_open_common(path, layout, Open_cow, 1);
 }
+
+#ifdef _WIN32
 /*
  * pmemobj_open -- open a transactional memory pool
  */
@@ -1540,7 +1544,7 @@ pmemobj_openW(const wchar_t *path, const wchar_t *layout)
 		free(_layout);
 	return ret;
 }
-
+#endif
 
 /*
  * obj_replicas_cleanup -- (internal) free resources allocated for replicas
@@ -1665,6 +1669,7 @@ UNICODE_FUNCTION(pmemobj_check)(const char *path, const char *layout)
 	return consistent;
 }
 
+#ifdef _WIN32
 /*
  * pmemobj_checkW -- transactional memory pool consistency check
  */
@@ -1691,6 +1696,7 @@ pmemobj_checkW(const wchar_t *path, const wchar_t *layout)
 		free(_layout);
 	return ret;
 }
+#endif
 
 /*
  * pmemobj_pool_by_oid -- returns the pool handle associated with the oid
