@@ -40,7 +40,6 @@ use warnings;
 use File::Basename;
 use File::Find;
 use Encode;
-use IO::String;
 use v5.16;
 
 my $Me = $0;
@@ -101,9 +100,8 @@ sub check_whitespace {
 	my $eol;
 	my $nf = 0;
 	my $fstr = decode_file_as_string($full, $file);
-	my $io = IO::String->new($fstr);
 
-	while ($_ = $io->getline()) {
+	for (split /^/, $fstr) {
 		$line++;
 		s/\R/\n/g;
 		$eol = /[\n]/s;
@@ -118,8 +116,6 @@ sub check_whitespace {
 			err("$full: $line: spaces before tabs") if / \t/;
 		}
 	}
-
-	#close($handle);
 
 	err("$full: $line: .nf without .fi") if $nf;
 	err("$full: noeol") unless $eol;
