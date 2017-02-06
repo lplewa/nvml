@@ -101,7 +101,8 @@ wmain(int argc, wchar_t *argv[])
 	WSTART(argc, argv, "blk_pool");
 
 	if (argc < 4)
-		UT_FATAL("usage: %S op path bsize [poolsize mode]", ut_toUTF8(argv[0]));
+		UT_FATAL("usage: %s op path bsize [poolsize mode]",
+			ut_toUTF8(argv[0]));
 
 	size_t bsize = wcstoul(argv[3], NULL, 0);
 	size_t poolsize;
