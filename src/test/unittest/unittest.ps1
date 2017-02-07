@@ -33,7 +33,7 @@
 . "..\testconfig.ps1"
 
 function touch {
-    Out-File -InputObject $null -FilePath $args[0]
+    Out-File -InputObject $null -encoding ascii -FilePath $args[0]
 }
 
 function epoch {
