@@ -181,11 +181,11 @@
 #endif
 
 #include "libpmem.h"
-
 #include "pmem.h"
 #include "cpu.h"
 #include "out.h"
 #include "util.h"
+#include "os.h"
 #include "mmap.h"
 #include "file.h"
 #include "valgrind_internal.h"
@@ -631,7 +631,7 @@ pmem_map_file(const char *path, size_t len, int flags, mode_t mode,
 			return NULL;
 		}
 	} else {
-		if ((fd = open(path, open_flags, mode)) < 0) {
+		if ((fd = os_open(path, open_flags, mode)) < 0) {
 			ERR("!open %s", path);
 			return NULL;
 		}
