@@ -70,8 +70,10 @@
 
 use strict;
 use Getopt::Std;
-select STDERR;
+use Encode;
 use v5.16;
+
+select STDERR;
 binmode(STDOUT, ":utf8");
 binmode(STDERR, ":utf8");
 
@@ -106,12 +108,12 @@ if ($opt_a) {
 	closedir(DIR);
 	die "no files found to process\n" unless @matchfiles;
 	foreach my $mfile (@matchfiles)  {
-		die "$mfile: $!\n" unless open(F, "<:encoding(utf8)", $mfile);
+		die "$mfile: $!\n" unless open(F, $mfile);
 		close(F);
 		my $ofile = $mfile;
 		$ofile =~ s/\.match$//;
 		die "$mfile found but cannot open $ofile: $!\n"
-			unless open(F, "<:encoding(utf8)", $ofile);
+			unless open(F, $ofile);
 		close(F);
 		$match2file{$mfile} = $ofile;
 	}
@@ -124,9 +126,9 @@ if ($opt_a) {
 		my $ofile = $mfile;
 		usage("$mfile: not a .match file") unless
 			$ofile =~ s/\.match$//;
-		usage("$mfile: $!") unless open(F, "<:encoding(utf8)", $mfile);
+		usage("$mfile: $!") unless open(F, $mfile);
 		close(F);
-		usage("$ofile: $!") unless open(F, "<:encoding(utf8)", $ofile);
+		usage("$ofile: $!") unless open(F, $ofile);
 		close(F);
 		$match2file{$mfile} = $ofile;
 	}
@@ -156,8 +158,8 @@ sub match {
 	my $line_out = 0;
 	my $opt = 0;
 
-	open(F, "<:encoding(utf8)", $mfile) or die "$mfile: $!\n";
-	while (<F>) {
+	my $fstr = snarf($mfile);
+	for (split /^/, $fstr) {
 		$pat = $_;
 		$line_pat++;
 		$line_out++;
@@ -222,13 +224,26 @@ sub match {
 # snarf -- slurp an entire file into memory
 #
 sub snarf {
-	my ($fname) = @_;
+	my ($file) = @_;
+	my $fh;
+	open($fh, '<', $file) or die "$file $!\n";
+
 	local $/;
-	my $contents;
+	$_ = <$fh>;
+	close $fh;
 
-	open(R, "<:encoding(utf8)", $fname) or die "$fname: $!\n";
-	$contents = <R>;
-	close(R);
+	# check known encodings or die
+	my $decoded;
+	my @encodings = ("UTF-8", "UTF-16", "UTF-16LE", "UTF-16BE");
 
-	return $contents;
+	foreach my $enc (@encodings) {
+		eval { $decoded = decode( $enc, $_, Encode::FB_CROAK ) };
+
+		if (!$@) {
+			$decoded =~ s/\R/\n/g;
+			return $decoded;
+		}
+	}
+
+	die "$Me: ERROR: Unknown file encoding";
 }
