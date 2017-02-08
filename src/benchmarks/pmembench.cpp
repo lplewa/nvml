@@ -1194,9 +1194,22 @@ out:
 	return ret;
 }
 
+#ifdef _WIN32
+int
+wmain(int argc, wchar_t *argv[])
+{
+	char **cargv = (char **)calloc(argc, sizeof(*cargv));
+	for (auto i = 0; i < argc; ++i) {
+		cargv[i] = util_toUTF8((utf16_t *)argv[i]);
+	}
+#else
+
 int
 main(int argc, char *argv[])
 {
+	char **cargv = argv;
+
+#endif
 	util_init();
 	util_mmap_init();
 
@@ -1217,7 +1230,7 @@ main(int argc, char *argv[])
 	}
 
 	pb->argc = --argc;
-	pb->argv = ++argv;
+	pb->argv = ++cargv;
 
 	char *bench_name = pb->argv[0];
 	if (NULL == bench_name) {
@@ -1237,6 +1250,10 @@ main(int argc, char *argv[])
 	}
 
 out:
+#ifdef _WIN32
+	free(cargv);
+#endif
+
 	free(pb);
 	return ret;
 }

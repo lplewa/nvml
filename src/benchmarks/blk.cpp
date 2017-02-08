@@ -36,6 +36,7 @@
 
 #include "benchmark.hpp"
 #include "libpmemblk.h"
+#include "os.h"
 #include <cassert>
 #include <cerrno>
 #include <cstdint>
@@ -326,7 +327,7 @@ blk_init(struct blk_bench *bb, struct benchmark_args *args)
 #ifdef _WIN32
 		flags |= O_BINARY;
 #endif
-		bb->fd = open(args->fname, flags, args->fmode);
+		bb->fd = os_open(args->fname, flags, args->fmode);
 		if (bb->fd < 0) {
 			perror("open");
 			return -1;

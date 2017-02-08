@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017, Intel Corporation
+ * Copyright 2017, Intel Corporation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -31,7 +31,7 @@
  */
 
 /*
- * out_err_mt.c -- unit test for error messages
+ * out_err_mt_win.c -- unit test for error messages
  */
 
 #include <sys/types.h>
@@ -51,10 +51,6 @@ print_errors(const wchar_t *msg)
 	UT_OUT("PMEMOBJ: %S", pmemobj_errormsgW());
 	UT_OUT("PMEMLOG: %S", pmemlog_errormsgW());
 	UT_OUT("PMEMBLK: %S", pmemblk_errormsgW());
-#ifndef _WIN32
-	/* XXX - vmem not implemented in windows yet */
-	UT_OUT("VMEM: %S", vmem_errormsgW());
-#endif
 	UT_OUT("PMEMPOOL: %S", pmempool_errormsgW());
 }
 
@@ -93,16 +89,6 @@ check_errors(int ver)
 	UT_ASSERTeq(err_need, ver);
 	UT_ASSERTeq(err_found, PMEMBLK_MAJOR_VERSION);
 
-#ifndef _WIN32
-	/* XXX - vmem not implemented in windows yet */
-	ret = swscanf(vmem_errormsgW(),
-		L"libvmem major version mismatch (need %d, found %d)",
-		&err_need, &err_found);
-	UT_ASSERTeq(ret, 2);
-	UT_ASSERTeq(err_need, ver);
-	UT_ASSERTeq(err_found, VMEM_MAJOR_VERSION);
-#endif
-
 	ret = swscanf(pmempool_errormsgW(),
 		L"libpmempool major version mismatch (need %d, found %d)",
 		&err_need, &err_found);
@@ -120,10 +106,6 @@ do_test(void *arg)
 	pmemobj_check_version(ver, 0);
 	pmemlog_check_version(ver, 0);
 	pmemblk_check_version(ver, 0);
-#ifndef _WIN32
-	/* XXX - vmem not implemented in windows yet */
-	vmem_check_version(ver, 0);
-#endif
 	pmempool_check_version(ver, 0);
 	check_errors(ver);
 
@@ -148,7 +130,7 @@ run_mt_test(void *(*worker)(void *))
 int
 wmain(int argc, wchar_t *argv[])
 {
-	WSTART(argc, argv, "out_err_mt");
+	WSTART(argc, argv, "out_err_mt_win");
 
 	if (argc != 5)
 		UT_FATAL("usage: %S filename1 filename2 filename3 dir",
@@ -160,10 +142,6 @@ wmain(int argc, wchar_t *argv[])
 		PMEMLOG_MIN_POOL, 0666);
 	PMEMblkpool *pbp = pmemblk_createW(argv[3],
 		128, PMEMBLK_MIN_POOL, 0666);
-#ifndef _WIN32
-	/* XXX - vmem not implemented in windows yet */
-	VMEM *vmp = vmem_createW(argv[4], VMEM_MIN_POOL);
-#endif
 
 	util_init();
 
@@ -171,10 +149,6 @@ wmain(int argc, wchar_t *argv[])
 	pmemobj_check_version(10001, 0);
 	pmemlog_check_version(10002, 0);
 	pmemblk_check_version(10003, 0);
-#ifndef _WIN32
-	/* XXX - vmem not implemented in windows yet */
-	vmem_check_version(10004, 0);
-#endif
 	pmempool_check_version(10005, 0);
 	print_errors(L"version check");
 
@@ -195,22 +169,11 @@ wmain(int argc, wchar_t *argv[])
 	pmemblk_set_error(pbp, nblock + 1);
 	print_errors(L"pmemblk_set_error");
 
-#ifndef _WIN32
-	/* XXX - vmem not implemented in windows yet */
-	VMEM *vmp2 = vmem_create_in_region(NULL, 1);
-	UT_ASSERTeq(vmp2, NULL);
-	print_errors(L"vmem_create_in_region");
-#endif
-
 	run_mt_test(do_test);
 
 	pmemobj_close(pop);
 	pmemlog_close(plp);
 	pmemblk_close(pbp);
-#ifndef _WIN32
-	/* XXX - vmem not implemented in windows yet */
-	vmem_delete(vmp);
-#endif
 
 	PMEMpoolcheck *ppc;
 	struct pmempool_check_args args = {0, };
