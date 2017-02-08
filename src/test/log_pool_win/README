@@ -1,8 +1,8 @@
 Non-Volatile Memory Library
 
-This is src/test/log_pool/README.
+This is src/test/log_pool_win/README.
 
-This directory contains a unit test for pmemlog_create() and pmemlog_open().
+This directory contains a unit test for pmemlog_createW() and pmemlog_openW().
 
 The program in log_pool.c takes: operation, path, poolsize, mode
 Operation can be:
@@ -11,7 +11,7 @@ Operation can be:
 
 For example:
 
-	./log_pool c /my/file 20 0640
+	./log_pool_win c /my/file 20 0640
 
 This calls pmemlog_create() with the given arguments.  Note that poolsize
 is given in megabytes.

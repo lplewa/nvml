@@ -1,0 +1,4 @@
+log_pool_win$(nW)TEST11w: START: log_pool_win
+ $(nW)log_pool_win$(nW) c $(nW)testset 0 0600
+$(nW)testset: file size $(N) usable space 41869312 mode 0600
+log_pool_win$(nW)TEST11w: DONE
