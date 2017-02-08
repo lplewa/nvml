@@ -1,10 +1,10 @@
 Non-Volatile Memory Library
 
-This is src/test/obj_pool/README.
+This is src/test/obj_pool_win/README.
 
 This directory contains a unit test for pmemobj_create() and pmemobj_open().
 
-The program in obj_pool.c takes: operation, path, layout, poolsize, mode
+The program in obj_pool_win.c takes: operation, path, layout, poolsize, mode
 Operation can be:
     c - create
     o - open
@@ -13,7 +13,7 @@ Operation can be:
 
 For example:
 
-	./obj_pool c /my/file "test_layout" 20 0640
+	./obj_pool_win c /my/file "test_layout" 20 0640
 
 This calls pmemobj_create() with the given arguments.  Note that poolsize
 is given in megabytes.
@@ -45,7 +45,7 @@ TEST13 (pass)	non-existing file, poolsize >= min required size, layout == ""
 TEST14 (fail)	non-existing file, poolsize >= min required size, layout != NULL
 		layout string is too long
 TEST15 (pass)	non-existing file, poolsize >= min required size, layout != NULL,
-		unicode characters
+		Unicode characters
 
 - pmemobj_open:
 
