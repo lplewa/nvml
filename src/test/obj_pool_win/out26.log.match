@@ -1,0 +1,4 @@
+obj_pool_win$(nW)TEST26: START: obj_pool_win
+ $(nW)obj_pool_win$(nW) o $(nW)testfile NULL
+$(nW)testfile: pmemobj_open: Permission denied
+obj_pool_win$(nW)TEST26: DONE
