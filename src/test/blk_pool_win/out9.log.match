@@ -1,0 +1,4 @@
+blk_pool_win$(nW)TEST9: START: blk_pool_win
+ $(nW)blk_pool_win$(nW) c $(nW)testfile 4096 1 0640
+$(nW)testfile: pmemblk_create: Invalid argument
+blk_pool_win$(nW)TEST9: DONE
