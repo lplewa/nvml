@@ -295,7 +295,7 @@ function require_pmem {
 #
 function create_poolset {
     $psfile = $args[0]
-    echo "PMEMPOOLSET" | out-file -encoding ASCII $psfile
+    echo "PMEMPOOLSET" | out-file -encoding utf8 $psfile
     for ($i=1;$i -lt $args.count;$i++) {
         if ($args[$i] -eq "M" -Or $args[$i] -eq 'm') { # remote replica
             $i++
@@ -303,11 +303,11 @@ function create_poolset {
             $fparms = ($cmd.Split("{:}"))
             $node = $fparms[0]
             $desc = $fparms[1]
-            echo "REPLICA $node $desc" | out-file -Append -encoding ASCII $psfile
+            echo "REPLICA $node $desc" | out-file -Append -encoding utf8 $psfile
             continue
         }
         if ($args[$i] -eq "R" -Or $args[$i] -eq 'r') {
-            echo "REPLICA" | out-file -Append -encoding ASCII $psfile
+            echo "REPLICA" | out-file -Append -encoding utf8 $psfile
             continue
         }
         $cmd = $args[$i]
@@ -354,7 +354,7 @@ function create_poolset {
         #     chmod $mode $fpath
         # fi
 
-        echo "$fsize $fpath" | out-file -Append -encoding ASCII $psfile
+        echo "$fsize $fpath" | out-file -Append -encoding utf8 $psfile
     } # for args
 }
 
@@ -586,16 +586,20 @@ function require_binary() {
 #
 # converts file to UTF8 w/o bom encoding
 #
-function convert_files_to_utf8_wo_bom {
-    sv -Name files $args[0]
-    foreach($file in $files) {
-        $content = Get-Content $file
-        $path = (Get-Item -Path ".\" -Verbose).FullName | Join-Path -ChildPath $file
-        if($content -ne $null) {
-            [IO.File]::WriteAllLines($path, $content)
-        }
-    }
-}
+#function convert_files_to_utf8_wo_bom {
+#    sv -Name files $args[0]
+#    foreach($file in $files) {
+#        $content = Get-Content $file
+#        $path = (Get-Item -Path ".\" -Verbose).FullName | Join-Path -ChildPath $file
+#        if($content -ne $null) {
+#            [IO.File]::WriteAllLines($path, $content)
+#        } else {
+#            # recreate as empty file to remove boom
+#            rm -Force -ea si $path
+#            Out-File -InputObject $null -Encoding ascii -FilePath $path
+#        }
+#    }
+#}
 
 #
 # check -- check test results (using .match files)
@@ -612,11 +616,11 @@ function check {
     }
     [string]$listing = Get-ChildItem -File | Where-Object  {$_.Name -match "[^0-9]${Env:UNITTEST_NUM}.log.match"}
     if ($listing) {
-        $outputs = $listing.Split(' ')
-        for($i=0; $i -lt $outputs.Count; $i++) {
-            $outputs[$i] = ([io.fileinfo]$outputs[$i]).basename # remove .match extension
-        }
-        convert_files_to_utf8_wo_bom $outputs
+ #      $outputs = $listing.Split(' ')
+ #      for($i=0; $i -lt $outputs.Count; $i++) {
+ #          $outputs[$i] = ([io.fileinfo]$outputs[$i]).basename # remove .match extension
+ #      }
+ #       convert_files_to_utf8_wo_bom $outputs
         $pinfo = New-Object System.Diagnostics.ProcessStartInfo
         $pinfo.FileName = "perl"
         $pinfo.RedirectStandardError = $true
