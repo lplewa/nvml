@@ -1,0 +1,4 @@
+vmem_create_win$(nW)TEST1: START: vmem_create_win
+ $(nW)vmem_create_win$(nW) $(nW)⿆⾨ㆦ
+signal: Segmentation fault
+vmem_create_win$(nW)TEST1: DONE
