@@ -1,0 +1,4 @@
+blk_pool_win$(nW)TEST31: START: blk_pool_win
+ $(nW)blk_pool_win$(nW) o $(nW)ㅹestㆅile 4096
+$(nW)ㅹestㆅile: pmemblk_open: Success
+blk_pool_win$(nW)TEST31: DONE
