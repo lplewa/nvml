@@ -1,0 +1,4 @@
+log_pool_win$(nW)TEST27: START: log_pool_win
+ $(nW)log_pool_win$(nW) o $(nW)testset
+$(nW)testset: pmemlog_open: Success
+log_pool_win$(nW)TEST27: DONE

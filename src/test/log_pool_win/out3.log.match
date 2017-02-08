@@ -1,0 +1,4 @@
+log_pool_win$(nW)TEST3: START: log_pool_win
+ $(nW)log_pool_win$(nW) c $(nW)testfile 20 0600
+$(nW)testfile: pmemlog_create: File exists
+log_pool_win$(nW)TEST3: DONE
