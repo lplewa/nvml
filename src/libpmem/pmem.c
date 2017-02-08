@@ -541,8 +541,8 @@ pmem_is_pmem(const void *addr, size_t len)
  * pmem_map_file -- create or open the file and map it to memory
  */
 void *
-pmem_map_file(const char *path, size_t len, int flags, mode_t mode,
-	size_t *mapped_lenp, int *is_pmemp)
+UNICODE_FUNCTION(pmem_map_file)(const char *path, size_t len, int flags,
+	mode_t mode, size_t *mapped_lenp, int *is_pmemp)
 {
 	LOG(3, "path \"%s\" size %zu flags %x mode %o mapped_lenp %p "
 		"is_pmemp %p", path, len, flags, mode, mapped_lenp, is_pmemp);
@@ -691,6 +691,23 @@ err:
 	errno = oerrno;
 	return NULL;
 }
+#ifdef _WIN32
+/*
+ * pmem_map_fileW -- create or open the file and map it to memory
+ */
+void *
+pmem_map_fileW(const wchar_t *path, size_t len, int flags, mode_t mode,
+		size_t *mapped_lenp, int *is_pmemp) {
+	utf8_t *_path = util_toUTF8(path);
+	if (_path == NULL)
+		return NULL;
+	void *ret = pmem_map_fileU(_path, len, flags, mode, mapped_lenp,
+					is_pmemp);
+
+	free(_path);
+	return ret;
+}
+#endif
 
 /*
  * pmem_unmap -- unmap the specified region
