@@ -114,7 +114,7 @@ util_aligned_free(void *ptr)
  * util_toUTF8 -- XXX
  */
 utf8_t *
-util_toUTF8(const utf16_t *wstr)
+util_toUTF8(const wchar_t *wstr)
 {
 	int size = WideCharToMultiByte(CP_UTF8, 0, wstr, -1,
 		NULL, 0, NULL, NULL);
@@ -164,4 +164,26 @@ util_toUTF16(const utf8_t *wstr)
 	}
 
 	return str;
+}
+
+/*
+ * util_toUTF16 -- XXX user responsible for supplying a large enough out buffer.
+ */
+int
+util_toUTF16_inplace(const utf8_t *in, utf16_t *out)
+{
+	if (out == NULL)
+		goto err;
+
+	int size = MultiByteToWideChar(CP_UTF8, 0, in, -1, NULL, 0);
+	if (size == 0 || ARRAY_SIZE(out) < size)
+		goto err;
+
+	if (MultiByteToWideChar(CP_UTF8, 0, in, -1, out, size) == 0)
+		goto err;
+
+	return 0;
+err:
+	errno = EINVAL;
+	return -1;
 }

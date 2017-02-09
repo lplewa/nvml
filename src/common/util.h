@@ -101,6 +101,7 @@ void util_aligned_free(void *ptr);
 #ifdef _WIN32
 utf8_t *util_toUTF8(const utf16_t *wstr);
 utf16_t *util_toUTF16(const utf8_t *wstr);
+int util_toUTF16_inplace(const utf8_t *in, utf16_t *out);
 #endif
 
 #define UTIL_MAX_ERR_MSG 128
