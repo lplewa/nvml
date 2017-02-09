@@ -195,10 +195,18 @@ int pmempool_rm(const char *path, int flags);
 const char *pmempool_check_version(unsigned major_required,
 	unsigned minor_required);
 
-/*
- * get the last error message
- */
+#ifdef _WIN32
+#ifdef UNICODE
+#define pmempool_errormsg pmempool_errormsgW
+#else
+#define pmempool_errormsg pmempool_errormsgU
+#endif
+const char *pmempool_errormsgU(void);
+
+const wchar_t *pmempool_errormsgW(void);
+#else
 const char *pmempool_errormsg(void);
+#endif
 
 #ifdef __cplusplus
 }

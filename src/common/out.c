@@ -69,6 +69,12 @@ static unsigned Log_alignment;
 static pthread_once_t Last_errormsg_key_once = PTHREAD_ONCE_INIT;
 static pthread_key_t Last_errormsg_key;
 
+#ifdef _WIN32
+#define MAXPRINTW (MAXPRINT * 4)	/* maximum expected log line in wchar_t */
+
+static pthread_key_t Last_errormsgw_key;
+#endif
+
 static void
 _Last_errormsg_key_alloc(void)
 {
@@ -77,6 +83,12 @@ _Last_errormsg_key_alloc(void)
 		FATAL("!pthread_key_create");
 
 	VALGRIND_ANNOTATE_HAPPENS_BEFORE(&Last_errormsg_key_once);
+
+#ifdef _WIN32
+	pth_ret = pthread_key_create(&Last_errormsgw_key, free);
+	if (pth_ret)
+		FATAL("!pthread_key_create");
+#endif
 }
 
 static void
@@ -98,6 +110,14 @@ Last_errormsg_fini()
 		free(p);
 		(void) pthread_setspecific(Last_errormsg_key, NULL);
 	}
+
+#ifdef _WIN32
+	p = pthread_getspecific(Last_errormsgw_key);
+	if (p) {
+		free(p);
+		(void)pthread_setspecific(Last_errormsgw_key, NULL);
+	}
+#endif
 }
 
 static inline const char *
@@ -114,6 +134,24 @@ Last_errormsg_get()
 	}
 	return errormsg;
 }
+
+#ifdef _WIN32
+static inline utf16_t *
+Last_errormsgw_get()
+{
+	Last_errormsg_key_alloc();
+
+	utf16_t *errormsg = pthread_getspecific(Last_errormsgw_key);
+	if (errormsg == NULL) {
+		errormsg = malloc(MAXPRINTW);
+		int ret = pthread_setspecific(Last_errormsgw_key, errormsg);
+		if (ret)
+			FATAL("!pthread_setspecific");
+	}
+	return errormsg;
+}
+#endif
+
 #else
 
 /*
@@ -557,11 +595,27 @@ out_err(const char *file, int line, const char *func,
 	va_end(ap);
 }
 
+#ifdef _WIN32
+/*
+* out_get_errormsgW -- get the last error message in wchar_t
+*/
+const wchar_t *
+out_get_errormsgW(void)
+{
+	const char *utf8 = Last_errormsg_get();
+	utf16_t *utf16 = Last_errormsgw_get();
+	if (util_toUTF16_inplace(utf8, utf16) != 0)
+		FATAL("!Failed to convert string");
+	
+	return (const wchar_t *)utf16;
+}
+#endif
+
 /*
  * out_get_errormsg -- get the last error message
  */
 const char *
-out_get_errormsg(void)
+UNICODE_FUNCTION(out_get_errormsg)(void)
 {
 	return Last_errormsg_get();
 }

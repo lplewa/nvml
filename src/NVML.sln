@@ -326,6 +326,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vmem_create_in_region", "te
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{746BA101-5C93-42A5-AC7A-64DCEB186572}"
 	ProjectSection(SolutionItems) = preProject
+		test\out_err_win\out_err_win.vcxproj = test\out_err_win\out_err_win.vcxproj
 		test\RUNTESTS.ps1 = test\RUNTESTS.ps1
 	EndProjectSection
 EndProject
@@ -753,6 +754,10 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vmem_check", "test\vmem_check\vmem_check.vcxproj", "{FF374D62-CBCF-401E-9A02-1D3DB8BE16E4}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "obj_list_remove", "test\obj_list_remove\obj_list_remove.vcxproj", "{FF6E5B0C-DC00-4C93-B9C2-63D1E858BA79}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "out_err_win", "test\out_err_win\out_err_win.vcxproj", "{A57D9365-172E-4782-ADC6-82A594E30943}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "out_err_mt_win", "test\out_err_mt_win\out_err_mt_win.vcxproj", "{2B1A5104-A324-4D02-B5C7-D021FB8F880C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -1685,6 +1690,14 @@ Global
 		{FF6E5B0C-DC00-4C93-B9C2-63D1E858BA79}.Debug|x64.Build.0 = Debug|x64
 		{FF6E5B0C-DC00-4C93-B9C2-63D1E858BA79}.Release|x64.ActiveCfg = Release|x64
 		{FF6E5B0C-DC00-4C93-B9C2-63D1E858BA79}.Release|x64.Build.0 = Release|x64
+		{A57D9365-172E-4782-ADC6-82A594E30943}.Debug|x64.ActiveCfg = Debug|x64
+		{A57D9365-172E-4782-ADC6-82A594E30943}.Debug|x64.Build.0 = Debug|x64
+		{A57D9365-172E-4782-ADC6-82A594E30943}.Release|x64.ActiveCfg = Release|x64
+		{A57D9365-172E-4782-ADC6-82A594E30943}.Release|x64.Build.0 = Release|x64
+		{2B1A5104-A324-4D02-B5C7-D021FB8F880C}.Debug|x64.ActiveCfg = Debug|x64
+		{2B1A5104-A324-4D02-B5C7-D021FB8F880C}.Debug|x64.Build.0 = Debug|x64
+		{2B1A5104-A324-4D02-B5C7-D021FB8F880C}.Release|x64.ActiveCfg = Release|x64
+		{2B1A5104-A324-4D02-B5C7-D021FB8F880C}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1940,5 +1953,7 @@ Global
 		{FEA09B48-34C2-4963-8A5A-F97BDA136D72} = {746BA101-5C93-42A5-AC7A-64DCEB186572}
 		{FF374D62-CBCF-401E-9A02-1D3DB8BE16E4} = {746BA101-5C93-42A5-AC7A-64DCEB186572}
 		{FF6E5B0C-DC00-4C93-B9C2-63D1E858BA79} = {746BA101-5C93-42A5-AC7A-64DCEB186572}
+		{A57D9365-172E-4782-ADC6-82A594E30943} = {746BA101-5C93-42A5-AC7A-64DCEB186572}
+		{2B1A5104-A324-4D02-B5C7-D021FB8F880C} = {746BA101-5C93-42A5-AC7A-64DCEB186572}
 	EndGlobalSection
 EndGlobal

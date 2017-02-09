@@ -88,6 +88,17 @@ vmem_set_funcs(
 	je_vmem_pool_set_alloc_funcs(malloc_func, free_func);
 }
 
+#ifdef _WIN32
+/*
+* vmem_errormsgW -- return last error message as unicode
+*/
+const wchar_t *
+vmem_errormsgW(void)
+{
+	return out_get_errormsgW();
+}
+#endif
+
 /*
  * vmem_errormsg -- return last error message
  */

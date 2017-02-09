@@ -111,11 +111,22 @@ pmempool_check_version(unsigned major_required, unsigned minor_required)
 	return NULL;
 }
 
+#ifdef _WIN32
+/*
+* pmempool_errormsgW -- return last error message as unicode
+*/
+const wchar_t *
+pmempool_errormsgW(void)
+{
+	return out_get_errormsgW();
+}
+#endif
+
 /*
  * pmempool_errormsg -- return last error message
  */
 const char *
-pmempool_errormsg(void)
+UNICODE_FUNCTION(pmempool_errormsg)(void)
 {
 	return out_get_errormsg();
 }
