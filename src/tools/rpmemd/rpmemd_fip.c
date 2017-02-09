@@ -1,5 +1,5 @@
 /*
- * Copyright 2016, Intel Corporation
+ * Copyright 2016-2017, Intel Corporation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -50,6 +50,12 @@
 #include <rdma/fi_cm.h>
 #include <rdma/fi_errno.h>
 
+#include "rpmemd_log.h"
+
+/* change logging functions to ones specific to rpmemd */
+#define FATAL RPMEMD_FATAL
+#define ERR RPMEMD_ERR
+
 #include "rpmem_common.h"
 #include "rpmem_proto.h"
 #include "rpmem_fip_msg.h"
@@ -57,13 +63,9 @@
 #include "rpmem_fip_lane.h"
 #include "rpmemd_fip_worker.h"
 #include "rpmemd_fip.h"
-#include "rpmemd_log.h"
 
 #include "util.h"
 #include "valgrind_internal.h"
-
-#define FATAL RPMEMD_FATAL
-#include "sys_util.h"
 
 #define RPMEMD_FI_ERR(e, fmt, args...)\
 	RPMEMD_LOG(ERR, fmt ": %s", ## args, fi_strerror((e)))
@@ -330,12 +332,10 @@ rpmemd_fip_init_memory(struct rpmemd_fip *fip)
 			&fip->mr, NULL);
 	if (ret) {
 		RPMEMD_FI_ERR(ret, "registering memory");
-		goto err_mr_reg;
+		return -1;
 	}
 
 	return 0;
-err_mr_reg:
-	return -1;
 }
 
 /*
@@ -382,14 +382,7 @@ err_cq_open:
 static int
 rpmemd_fip_fini_cq(struct rpmemd_fip *fip)
 {
-	int lret = 0;
-	int ret;
-
-	ret = RPMEMD_FI_CLOSE(fip->cq, "closing completion queue");
-	if (ret)
-		lret = ret;
-
-	return lret;
+	return RPMEMD_FI_CLOSE(fip->cq, "closing completion queue");
 }
 
 /*
@@ -449,14 +442,7 @@ err_endpoint:
 static int
 rpmemd_fip_fini_ep(struct rpmemd_fip *fip)
 {
-	int lret = 0;
-	int ret;
-
-	ret = RPMEMD_FI_CLOSE(fip->ep, "closing endpoint");
-	if (ret)
-		lret = ret;
-
-	return lret;
+	return RPMEMD_FI_CLOSE(fip->ep, "closing endpoint");
 }
 
 /*
@@ -553,12 +539,10 @@ rpmemd_fip_post_gpspm(struct rpmemd_fip *fip)
 		struct rpmemd_fip_lane *lanep = &fip->lanes[i];
 		ret = rpmemd_fip_gpspm_post_msg(fip, &lanep->recv);
 		if (ret)
-			goto err_post_resp;
+			return ret;
 	}
 
 	return 0;
-err_post_resp:
-	return ret;
 }
 
 /*
@@ -772,8 +756,7 @@ rpmemd_fip_worker(void *arg, void *data)
 
 	/* post lane's SEND buffer */
 	ret = rpmemd_fip_gpspm_post_resp(fip, &lanep->send);
-	if (unlikely(ret))
-		goto err;
+
 err:
 	return ret;
 }
@@ -848,8 +831,6 @@ err:
 static int
 rpmemd_fip_process_start_gpspm(struct rpmemd_fip *fip)
 {
-	int ret = 0;
-
 	/*
 	 * Ring buffer size so all lanes will have
 	 * free slot in worker's ring buffer.
@@ -860,7 +841,6 @@ rpmemd_fip_process_start_gpspm(struct rpmemd_fip *fip)
 	fip->workers = malloc(fip->nthreads * sizeof(*fip->workers));
 	if (!fip->workers) {
 		RPMEMD_LOG(ERR, "!allocating workers");
-		ret = -1;
 		goto err_alloc_workers;
 	}
 
@@ -874,7 +854,6 @@ rpmemd_fip_process_start_gpspm(struct rpmemd_fip *fip)
 				&fip->closing, ring_size, rpmemd_fip_worker);
 		if (!fip->workers[wi]) {
 			RPMEMD_LOG(ERR, "!initializing worker");
-			ret = -1;
 			goto err_worker;
 		}
 	}
@@ -889,7 +868,6 @@ rpmemd_fip_process_start_gpspm(struct rpmemd_fip *fip)
 	fip->cq_entries = malloc(fip->cq_size * sizeof(*fip->cq_entries));
 	if (!fip->cq_entries) {
 		RPMEMD_LOG(ERR, "!allocating completion events buffer");
-		ret = -1;
 		goto err_cq_entries;
 	}
 
@@ -898,7 +876,6 @@ rpmemd_fip_process_start_gpspm(struct rpmemd_fip *fip)
 			rpmemd_fip_cq_thread, fip);
 	if (errno) {
 		RPMEMD_LOG(ERR, "!starting cq thread");
-		ret = -1;
 		goto err_cq_thread;
 	}
 
@@ -910,7 +887,7 @@ err_worker:
 	for (size_t i = 0; i < wi; i++)
 		rpmemd_fip_worker_fini(fip->workers[i]);
 err_alloc_workers:
-	return ret;
+	return -1;
 }
 
 /*
@@ -922,7 +899,7 @@ rpmemd_fip_process_stop_gpspm(struct rpmemd_fip *fip)
 	int lret = 0;
 
 	/* this stops all worker threads */
-	fip->closing = 1;
+	__sync_fetch_and_or(&fip->closing, 1);
 
 	/*
 	 * Signal all lanes that SEND has been completed.

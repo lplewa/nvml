@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016, Intel Corporation
+ * Copyright 2015-2017, Intel Corporation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,10 +33,10 @@
  * log.cpp -- pmemlog benchmarks definitions
  */
 
-#include <assert.h>
-#include <errno.h>
+#include <cassert>
+#include <cerrno>
+#include <cstring>
 #include <fcntl.h>
-#include <string.h>
 #include <sys/stat.h>
 #include <sys/uio.h>
 #include <unistd.h>
@@ -578,10 +578,13 @@ log_exit(struct benchmark *bench, struct benchmark_args *args)
 
 	return 0;
 }
+
 /* command line options definition */
 static struct benchmark_clo log_clo[6];
+
 /* log_append benchmark info */
 static struct benchmark_info log_append_info;
+
 /* log_read benchmark info */
 static struct benchmark_info log_read_info;
 
@@ -612,13 +615,15 @@ log_costructor(void)
 	log_clo[2].off = clo_field_offset(struct prog_args, fileio);
 	log_clo[2].type = CLO_TYPE_FLAG;
 
-	log_clo[3].opt_short = 'w', log_clo[3].opt_long = "no-warmup",
-	log_clo[3].descr = "Don't do warmup", log_clo[3].type = CLO_TYPE_FLAG,
-	log_clo[3].off = clo_field_offset(struct prog_args, no_warmup),
+	log_clo[3].opt_short = 'w';
+	log_clo[3].opt_long = "no-warmup";
+	log_clo[3].descr = "Don't do warmup", log_clo[3].type = CLO_TYPE_FLAG;
+	log_clo[3].off = clo_field_offset(struct prog_args, no_warmup);
 
-	log_clo[4].opt_short = 'm', log_clo[4].opt_long = "min-size",
+	log_clo[4].opt_short = 'm';
+	log_clo[4].opt_long = "min-size";
 	log_clo[4].descr = "Minimum size of append/read for "
-			   "random mode",
+			   "random mode";
 	log_clo[4].type = CLO_TYPE_UINT;
 	log_clo[4].off = clo_field_offset(struct prog_args, min_size);
 	log_clo[4].def = "1";
@@ -629,6 +634,7 @@ log_costructor(void)
 
 	/* this one is only for log_append */
 	log_clo[5].opt_short = 'v';
+	log_clo[5].opt_long = "vector";
 	log_clo[5].descr = "Vector size";
 	log_clo[5].off = clo_field_offset(struct prog_args, vec_size);
 	log_clo[5].def = "1";

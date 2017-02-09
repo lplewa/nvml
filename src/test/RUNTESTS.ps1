@@ -1,5 +1,5 @@
 #
-# Copyright 2015-2016, Intel Corporation
+# Copyright 2015-2017, Intel Corporation
 # Copyright (c) 2016, Microsoft Corporation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -53,7 +53,7 @@ Param(
     [alias("d")]
     $dreceivetype = "auto",
     [alias("o")]
-    $time = "60s",
+    $time = "180s",
     [alias("s")]
     $testfile = "all",
     [alias("i")]
@@ -209,47 +209,48 @@ function runtest {
         return
     }
 
-    Foreach ($fs in $fss.split(" ").trim()) {
-        # don't bother trying when fs-type isn't available...
-        if ($fs -eq "pmem" -And (-Not $Env:PMEM_FS_DIR)) {
-            $pmem_skip = 1
-            continue
-        }
-        if ($fs -eq "non-pmem" -And (-Not $Env:NON_PMEM_FS_DIR)) {
-            $non_pmem_skip = 1
-            continue
-        }
-        if ($fs -eq "any" -And (-Not $Env:NON_PMEM_FS_DIR) -And (-Not $Env:PMEM_FS_DIR)) {
-            continue
-        }
-
+    # for each TEST script found...
+    Foreach ($runscript in $runscripts.split(" ")) {
         if ($verbose) {
-            Write-Host "RUNTESTS: Testing fs-type: $fs..."
+            Write-Host "RUNTESTS: Test: $testName/$runscript "
         }
-        # for each build-type being tested...
-        Foreach ($build in $builds.split(" ").trim()) {
-            if ($verbose) {
-                Write-Host "RUNTESTS: Testing build-type: $build..."
+        Foreach ($fs in $fss.split(" ").trim()) {
+            # don't bother trying when fs-type isn't available...
+            if ($fs -eq "pmem" -And (-Not $Env:PMEM_FS_DIR)) {
+                $pmem_skip = 1
+                continue
             }
-            $Env:CHECK_TYPE = $checktype
-            $Env:CHECK_POOL = $check_pool
-            $Env:VERBOSE = $verbose
-            $Env:TEST_TYPE = $testtype
-            $Env:TEST_FS = $fs
-            $Env:TEST_BUILD = $build
-            $Env:EXE_DIR = get_build_dir $build
+            if ($fs -eq "non-pmem" -And (-Not $Env:NON_PMEM_FS_DIR)) {
+                $non_pmem_skip = 1
+                continue
+            }
+            if ($fs -eq "any" -And (-Not $Env:NON_PMEM_FS_DIR) -And (-Not $Env:PMEM_FS_DIR)) {
+                continue
+            }
 
-            $pinfo = New-Object System.Diagnostics.ProcessStartInfo
-            $pinfo.FileName = "powershell.exe"
-            $pinfo.RedirectStandardError = $true
-            $pinfo.RedirectStandardOutput = $true
-            $pinfo.UseShellExecute = $false
-
-            # for each TEST script found...
-            Foreach ($runscript in $runscripts.split(" ")) {
+            if ($verbose) {
+                Write-Host "RUNTESTS: Testing fs-type: $fs..."
+            }
+            # for each build-type being tested...
+            Foreach ($build in $builds.split(" ").trim()) {
                 if ($verbose) {
-                    Write-Host -NoNewline "RUNTESTS: Test: $testName/$runscript "
+                    Write-Host "RUNTESTS: Testing build-type: $build..."
                 }
+                $Env:CHECK_TYPE = $checktype
+                $Env:CHECK_POOL = $check_pool
+                $Env:VERBOSE = $verbose
+                $Env:TYPE = $testtype
+                $Env:FS = $fs
+                $Env:BUILD = $build
+                $Env:EXE_DIR = get_build_dir $build
+
+                $pinfo = New-Object System.Diagnostics.ProcessStartInfo
+                $pinfo.FileName = "powershell.exe"
+                $pinfo.RedirectStandardError = $true
+                $pinfo.RedirectStandardOutput = $true
+                $pinfo.UseShellExecute = $false
+                $pinfo.CreateNoWindow = $true
+
                 if ($dryrun -eq "1") {
                     Write-Host "(in ./$testName) TEST=$testtype FS=$fs BUILD=$build .\$runscript"
                     break
@@ -259,37 +260,43 @@ function runtest {
                 $p = New-Object System.Diagnostics.Process
                 $p.StartInfo = $pinfo
                 $p.Start() | Out-Null
+                $outTask = $p.StandardOutput.ReadToEndAsync()
+                $errTask = $p.StandardError.ReadToEndAsync()
+
                 If ($use_timeout -And $testtype -eq "check") {
                     # execute with timeout
                     $timeout = new-timespan -Seconds $time
                     $stopwatch = [diagnostics.stopwatch]::StartNew()
                     while (($stopwatch.elapsed -lt $timeout) -And `
                         ($p.HasExited -eq $false)) {
-                        # output streams have limited size, we need to read it
-                        # during an application runtime to prevent application hang.
-                        Write-Host -NoNewline $p.StandardOutput.ReadToEnd();
-                        Write-Host -NoNewline $p.StandardError.ReadToEnd();
+                        # wait for test exit or timeout
                     }
+
+                    # print test's console output
+                    Write-Host -NoNewline $outTask.Result;
+                    Write-Host -NoNewline $errTask.Result;
+
                     if ($stopwatch.elapsed -ge $timeout) {
                         $p | Stop-Process -Force
                         Write-Error "RUNTESTS: stopping: $testName/$runscript TIMED OUT, TEST=$testtype FS=$fs BUILD=$build"
                         cd ..
+                        exit $p.ExitCode
                     }
                 } Else {
                     $p.WaitForExit()
+                    # print test's console output
+                    Write-Host -NoNewline $outTask.Result;
+                    Write-Host -NoNewline $errTask.Result;
                 }
 
-                # print any remaining output
-                Write-Host -NoNewline $p.StandardOutput.ReadToEnd();
-                Write-Host -NoNewline $p.StandardError.ReadToEnd();
                 if ($p.ExitCode -ne 0) {
                     Write-Error "RUNTESTS: stopping: $testName/$runscript $msg errorcde= $p.ExitCode, TEST=$testtype FS=$fs BUILD=$build"
                     cd ..
                     exit $p.ExitCode
                 }
-            } # for runscripts
-        } # for builds
-    } # for fss
+            } # for builds
+        } # for fss
+    } # for runscripts
     cd ..
 }
 

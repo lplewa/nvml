@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016, Intel Corporation
+ * Copyright 2015-2017, Intel Corporation
  * Copyright (c) 2016, Microsoft Corporation. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -177,14 +177,12 @@ typedef int mode_t;
 /* unistd.h */
 typedef long long ssize_t;
 
-/* stdlib.h */
-int mkstemp(char *temp);
 int setenv(const char *name, const char *value, int overwrite);
 int unsetenv(const char *name);
 int rand_r(unsigned *seedp);
 
 /* fcntl.h */
-int posix_fallocate(int fd, off_t offset, off_t size);
+int posix_fallocate(int fd, off_t offset, off_t len);
 
 /* string.h */
 #define strtok_r strtok_s

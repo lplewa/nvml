@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016, Intel Corporation
+ * Copyright 2015-2017, Intel Corporation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -56,6 +56,10 @@ TOID_DECLARE(struct oob_item, 3);
 struct item {
 	int id;
 	POBJ_LIST_ENTRY(struct item) next;
+};
+
+struct oob_header {
+	char data[48];
 };
 
 struct oob_item {

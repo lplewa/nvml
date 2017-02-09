@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016, Intel Corporation
+ * Copyright 2015-2017, Intel Corporation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -56,6 +56,7 @@
 
 #include "file.h"
 #include "out.h"
+#include "os.h"
 
 /*
  * util_tmpfile --  (internal) create the temporary file
@@ -79,9 +80,9 @@ util_tmpfile(const char *dir, const char *templ)
 	 * is created.
 	 */
 
-	fd = mkstemp(fullname);
+	fd = os_mkstemp(fullname);
 	if (fd < 0) {
-		ERR("!mkstemp");
+		ERR("!os_mkstemp");
 		goto err;
 	}
 

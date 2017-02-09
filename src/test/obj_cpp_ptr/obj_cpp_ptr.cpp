@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016, Intel Corporation
+ * Copyright 2015-2017, Intel Corporation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -53,7 +53,8 @@ namespace
 {
 
 /*
- * test_null_ptr -- verifies if the pointer correctly behaves like a NULL-value
+ * test_null_ptr -- verifies if the pointer correctly behaves like a
+ * nullptr-value
  */
 void
 test_null_ptr(nvobj::persistent_ptr<int> &f)
@@ -61,7 +62,7 @@ test_null_ptr(nvobj::persistent_ptr<int> &f)
 	UT_ASSERT(OID_IS_NULL(f.raw()));
 	UT_ASSERT((bool)f == false);
 	UT_ASSERT(!f);
-	UT_ASSERTeq(f.get(), NULL);
+	UT_ASSERTeq(f.get(), nullptr);
 	UT_ASSERT(f == nullptr);
 }
 
@@ -77,7 +78,7 @@ get_temp()
 }
 
 /*
- * test_ptr_operators_null -- verifies various operations on NULL pointers
+ * test_ptr_operators_null -- verifies various operations on nullptr pointers
  */
 void
 test_ptr_operators_null()
@@ -96,7 +97,7 @@ test_ptr_operators_null()
 	int_same = int_base;
 	test_null_ptr(int_same);
 
-	std::swap(int_base, int_same);
+	swap(int_base, int_same);
 
 	auto temp_ptr = get_temp();
 	test_null_ptr(temp_ptr);
@@ -139,10 +140,11 @@ test_ptr_atomic(nvobj::pool<root> &pop)
 		UT_ASSERT(0);
 	}
 
-	UT_ASSERTne(pfoo.get(), NULL);
+	UT_ASSERTne(pfoo.get(), nullptr);
 
 	(*pfoo).bar = TEST_INT;
-	memset(&pfoo->arr, TEST_CHAR, sizeof(pfoo->arr));
+	pop.persist(pfoo);
+	pop.memset_persist(pfoo->arr, TEST_CHAR, sizeof(pfoo->arr));
 
 	for (auto c : pfoo->arr) {
 		UT_ASSERTeq(c, TEST_CHAR);
@@ -155,7 +157,7 @@ test_ptr_atomic(nvobj::pool<root> &pop)
 		UT_ASSERT(0);
 	}
 
-	UT_ASSERTeq(pfoo.get(), NULL);
+	UT_ASSERTeq(pfoo.get(), nullptr);
 }
 
 /*
@@ -165,12 +167,16 @@ void
 test_ptr_transactional(nvobj::pool<root> &pop)
 {
 	auto r = pop.get_root();
-
+	nvobj::persistent_ptr<foo> to_swap;
 	try {
 		nvobj::transaction::exec_tx(pop, [&] {
 			UT_ASSERT(r->pfoo == nullptr);
 
 			r->pfoo = nvobj::make_persistent<foo>();
+
+			/* allocate for future swap test */
+			to_swap = nvobj::make_persistent<foo>();
+
 		});
 	} catch (...) {
 		UT_ASSERT(0);
@@ -181,7 +187,22 @@ test_ptr_transactional(nvobj::pool<root> &pop)
 	try {
 		nvobj::transaction::exec_tx(pop, [&] {
 			pfoo->bar = TEST_INT;
+			/* raw memory access requires extra care */
+			nvml::detail::conditional_add_to_tx(&pfoo->arr);
 			memset(&pfoo->arr, TEST_CHAR, sizeof(pfoo->arr));
+
+			/* do the swap test */
+			nvobj::persistent_ptr<foo> foo_ptr{r->pfoo};
+			nvobj::persistent_ptr<foo> swap_ptr{to_swap};
+			to_swap.swap(r->pfoo);
+			UT_ASSERT(to_swap == foo_ptr);
+			UT_ASSERT(r->pfoo == swap_ptr);
+
+			swap(r->pfoo, to_swap);
+			UT_ASSERT(to_swap == swap_ptr);
+			UT_ASSERT(r->pfoo == foo_ptr);
+
+			nvobj::delete_persistent<foo>(to_swap);
 		});
 	} catch (...) {
 		UT_ASSERT(0);
@@ -234,8 +255,13 @@ test_ptr_array(nvobj::pool<root> &pop)
 		UT_ASSERT(0);
 	}
 
-	for (int i = 0; i < TEST_ARR_SIZE; ++i)
-		parr_vsize[i] = i;
+	{
+		nvobj::transaction::manual tx(pop);
+
+		for (int i = 0; i < TEST_ARR_SIZE; ++i)
+			parr_vsize[i] = i;
+		nvobj::transaction::commit();
+	}
 
 	for (int i = 0; i < TEST_ARR_SIZE; ++i)
 		UT_ASSERTeq(parr_vsize[i], i);
@@ -316,5 +342,5 @@ main(int argc, char *argv[])
 
 	pop.close();
 
-	DONE(NULL);
+	DONE(nullptr);
 }

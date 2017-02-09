@@ -44,6 +44,8 @@ TEST12 (pass)	non-existing file, poolsize >= min required size, layout == NULL
 TEST13 (pass)	non-existing file, poolsize >= min required size, layout == ""
 TEST14 (fail)	non-existing file, poolsize >= min required size, layout != NULL
 		layout string is too long
+TEST15 (pass)	non-existing file, poolsize >= min required size, layout != NULL,
+		unicode characters
 
 - pmemobj_open:
 
@@ -64,6 +66,10 @@ TEST28 (pass)	existing file, file length >= min required size, layout != NULL
 		layout matches the value from pool header
 TEST29 (fail)	existing poolset file, file length >= min required size, layout == NULL
 		bad format of the poolset file
+TEST31 (pass)	existing file, file length >= min required size, layout != NULL
+		layout matches the value from pool header, unicode characters
+TEST32 (pass)	existing poolset file, file length >= min required size, layout != NULL
+		uniocde characters
 
 - each case outputs:
 	- error, if error happened

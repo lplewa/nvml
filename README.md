@@ -31,15 +31,20 @@ These libraries and utilities are described in more detail on the
 [pmem web site](http://pmem.io).  There you'll find man pages, examples,
 and tutorials.
 
-**Currently, these libraries only work on 64-bit Linux.**
+**Currently, these libraries only work on 64-bit Linux and Windows (\*).**
 
->**NOTE: Porting NVML to 64-bit Windows is in progress.**
+>(\*) **NOTE: Porting NVML to Windows is still in progress.**
 >
 >The source tree contains MS Visual Studio solution and project files,
-allowing to compile _libpmem_, _libpmemlog_, _libpmemblk_ and _libpmemobj_,
-and most of the corresponding unit tests for 64-bit Windows.
-Current progress of this work is tracked on
+allowing to compile _libpmem_, _libpmemlog_, _libpmemblk_, _libpmemobj_,
+_libpmempool_ and _libvmem_ libraries for Windows, with all the corresponding
+unit tests and selected examples.  The _pmempool_ utility and NVML
+benchmarks are also ported.  Current progress of this work is tracked on
 [NVML for Windows Trello Board](https://trello.com/b/IMPSJ4Iu/nvml-for-windows).
+See also description of the first [NVML for Windows Technical Preview release]
+(https://github.com/pmem/nvml/releases/1.2+wtp1)
+for the list of known issues and limitations in the current version
+of Windows support in NVML.
 
 ### Pre-Built Packages ###
 
@@ -90,13 +95,9 @@ displayed instead. For details please read the **DEPENDENCIES** section
 in appropriate README file.
 
 
-See the **before_install:** rules in the
-[.travis.yml](https://github.com/pmem/nvml/blob/master/.travis.yml)
-file at the top level of the repository to get an idea what packages
-were required to build on the _Travis-CI_ systems.  Currently our Travis
-systems are running Ubuntu 16.04 and Fedora 23 so there may be some
-differences between what is specified in travis.yml and what is needed
-for your OS distribution and version.
+See our [Dockerfiles](https://github.com/pmem/nvml/blob/master/utils/docker/images/)
+to get an idea what packages are required to build on the _Travis-CI_
+system.
 
 
 #### Building NVML on Linux ####
@@ -231,6 +232,16 @@ To test the libraries with AddressSanitizer and UndefinedBehaviorSanitizer, run:
 	$ make EXTRA_CFLAGS="-fsanitize=address,undefined" EXTRA_LDFLAGS="-fsanitize=address,undefined" clobber all test check
 ```
 
+If you wish to run C++ standard library containers tests, you need to set the
+path to your custom versions of either gcc or libc++. For gcc run:
+```
+	$ make USE_CUSTOM_GCC=1 GCC_INCDIR=/path/to/includes GCC_LIBDIR=/path/to/lib check
+```
+If you want to use a custom version of libc++ run:
+```
+	$ make USE_LLVM_LIBCPP=1 LIBCPP_INCDIR=/path/to/includes/ LIBCPP_LIBDIR=/path/to/lib check
+```
+Please remember to set the appropriate versions of *CC/CXX* when using custom versions of the library.
 
 #### Building NVML on Windows ####
 

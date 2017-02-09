@@ -1,5 +1,5 @@
 /*
- * Copyright 2016, Intel Corporation
+ * Copyright 2016-2017, Intel Corporation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -54,7 +54,8 @@
 #define SIZEOF_ZONE_METADATA_V3 (SIZEOF_ZONE_HEADER_V3 +\
 	SIZEOF_CHUNK_HEADER_V3 * MAX_CHUNK_V3)
 #define SIZEOF_HEAP_HDR_V3 (1024)
-#define SIZEOF_ALLOCATION_HEADER_V3 (16)
+#define SIZEOF_LEGACY_ALLOCATION_HEADER_V3 (64)
+#define SIZEOF_COMPACT_ALLOCATION_HEADER_V3 (16)
 #define SIZEOF_LOCK_V3 (64)
 #define SIZEOF_PMEMOID_V3 (16)
 #define SIZEOF_LIST_ENTRY_V3 (SIZEOF_PMEMOID_V3 * 2)
@@ -63,7 +64,6 @@
 #define SIZEOF_LANE_V3 (3 * SIZEOF_LANE_SECTION_V3)
 #define SIZEOF_PVECTOR_V3 (224)
 #define SIZEOF_TX_RANGE_META_V3 (16)
-#define SIZEOF_TX_RANGE_CACHE_V3 (8112)
 #define SIZEOF_REDO_LOG_V3 (16)
 #define SIZEOF_LANE_LIST_LAYOUT_V3 (1024 - 8)
 #define SIZEOF_LANE_ALLOC_LAYOUT_V3 (10 * SIZEOF_REDO_LOG_V3)
@@ -93,7 +93,7 @@ main(int argc, char *argv[])
 
 	ASSERT_ALIGNED_BEGIN(struct chunk_run);
 	ASSERT_ALIGNED_FIELD(struct chunk_run, block_size);
-	ASSERT_ALIGNED_FIELD(struct chunk_run, bucket_vptr);
+	ASSERT_ALIGNED_FIELD(struct chunk_run, incarnation_claim);
 	ASSERT_ALIGNED_FIELD(struct chunk_run, bitmap);
 	ASSERT_ALIGNED_FIELD(struct chunk_run, data);
 	ASSERT_ALIGNED_CHECK(struct chunk_run);
@@ -135,13 +135,22 @@ main(int argc, char *argv[])
 	UT_COMPILE_ERROR_ON(sizeof(struct heap_header) !=
 		SIZEOF_HEAP_HDR_V3);
 
-	ASSERT_ALIGNED_BEGIN(struct allocation_header);
-	ASSERT_ALIGNED_FIELD(struct allocation_header, zone_id);
-	ASSERT_ALIGNED_FIELD(struct allocation_header, chunk_id);
-	ASSERT_ALIGNED_FIELD(struct allocation_header, size);
-	ASSERT_ALIGNED_CHECK(struct allocation_header);
-	UT_COMPILE_ERROR_ON(sizeof(struct allocation_header) !=
-		SIZEOF_ALLOCATION_HEADER_V3);
+	ASSERT_ALIGNED_BEGIN(struct allocation_header_legacy);
+	ASSERT_ALIGNED_FIELD(struct allocation_header_legacy, unused);
+	ASSERT_ALIGNED_FIELD(struct allocation_header_legacy, size);
+	ASSERT_ALIGNED_FIELD(struct allocation_header_legacy, unused2);
+	ASSERT_ALIGNED_FIELD(struct allocation_header_legacy, root_size);
+	ASSERT_ALIGNED_FIELD(struct allocation_header_legacy, type_num);
+	ASSERT_ALIGNED_CHECK(struct allocation_header_legacy);
+	UT_COMPILE_ERROR_ON(sizeof(struct allocation_header_legacy) !=
+		SIZEOF_LEGACY_ALLOCATION_HEADER_V3);
+
+	ASSERT_ALIGNED_BEGIN(struct allocation_header_compact);
+	ASSERT_ALIGNED_FIELD(struct allocation_header_compact, size);
+	ASSERT_ALIGNED_FIELD(struct allocation_header_compact, extra);
+	ASSERT_ALIGNED_CHECK(struct allocation_header_compact);
+	UT_COMPILE_ERROR_ON(sizeof(struct allocation_header_compact) !=
+		SIZEOF_COMPACT_ALLOCATION_HEADER_V3);
 
 	ASSERT_ALIGNED_BEGIN(struct redo_log);
 	ASSERT_ALIGNED_FIELD(struct redo_log, offset);
@@ -238,12 +247,6 @@ main(int argc, char *argv[])
 	ASSERT_ALIGNED_CHECK(struct tx_range);
 	UT_COMPILE_ERROR_ON(sizeof(struct tx_range) !=
 		SIZEOF_TX_RANGE_META_V3);
-
-	ASSERT_ALIGNED_BEGIN(struct tx_range_cache);
-	ASSERT_ALIGNED_FIELD(struct tx_range_cache, range);
-	ASSERT_ALIGNED_CHECK(struct tx_range_cache);
-	UT_COMPILE_ERROR_ON(sizeof(struct tx_range_cache) !=
-		SIZEOF_TX_RANGE_CACHE_V3);
 
 	DONE(NULL);
 }

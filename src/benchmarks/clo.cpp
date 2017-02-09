@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016, Intel Corporation
+ * Copyright 2015-2017, Intel Corporation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -32,12 +32,12 @@
 /*
  * clo.cpp -- command line options module definitions
  */
-#include <assert.h>
+#include <cassert>
+#include <cerrno>
+#include <cinttypes>
+#include <cstring>
 #include <err.h>
-#include <errno.h>
 #include <getopt.h>
-#include <inttypes.h>
-#include <string.h>
 
 #include "benchmark.hpp"
 #include "clo.hpp"
@@ -413,8 +413,10 @@ clo_parse_range(struct benchmark_clo *clo, const char *arg,
 		char *end;
 		errno = 0;
 		step = strtoull(str_step, &end, 10);
-		if (errno || !end || *end != '\0')
-			return -1;
+		if (errno || !end || *end != '\0') {
+			ret = -1;
+			goto out;
+		}
 
 		if (parse_single(clo, str_last, &last)) {
 			ret = -1;

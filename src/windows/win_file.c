@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016, Intel Corporation
+ * Copyright 2015-2017, Intel Corporation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -57,58 +57,57 @@
 #include <Shlwapi.h>
 #include <stdio.h>
 #include <pmemcompat.h>
-
-/*
- * mkstemp -- generate a unique temporary filename from template
- */
-int
-mkstemp(char *temp)
-{
-	unsigned rnd;
-	char *path = _mktemp(temp);
-
-	if (path == NULL)
-		return -1;
-
-	char npath[MAX_PATH];
-	strcpy(npath, path);
-
-	/*
-	 * Use rand_s to generate more unique tmp file name than _mktemp do.
-	 * In case with multiple threads and multiple files even after close()
-	 * file name conflicts occurred.
-	 * It resolved issue with synchronous removing
-	 * multiples files by system.
-	 */
-	rand_s(&rnd);
-	_snprintf(npath + strlen(npath), MAX_PATH, "%d", rnd);
-
-	/*
-	 * Use O_TEMPORARY flag to make sure the file is deleted when
-	 * the last file descriptor is closed.  Also, it prevents opening
-	 * this file from another process.
-	 */
-	return open(npath, O_RDWR | O_CREAT | O_EXCL | O_TEMPORARY,
-		S_IWRITE | S_IREAD);
-}
+#include <util.h>
 
 /*
  * posix_fallocate -- allocate file space
  */
 int
-posix_fallocate(int fd, off_t offset, off_t size)
+posix_fallocate(int fd, off_t offset, off_t len)
 {
-	if (offset > 0)
-		size += offset;
+	/*
+	 * From POSIX:
+	 * "EINVAL -- The len argument was zero or the offset argument was
+	 * less than zero."
+	 *
+	 * From Linux man-page:
+	 * "EINVAL -- offset was less than 0, or len was less than or
+	 * equal to 0"
+	 */
+	if (offset < 0 || len <= 0)
+		return EINVAL;
 
-	off_t len = _filelengthi64(fd);
-	if (len < 0)
-		return -1;
+	/*
+	 * From POSIX:
+	 * "EFBIG -- The value of offset+len is greater than the maximum
+	 * file size."
+	 *
+	 * Overflow can't be checked for by _chsize_s, since it only gets
+	 * the sum.
+	 */
+	if (offset + len < offset)
+		return EFBIG;
 
-	if (size < len)
+	/*
+	 * posix_fallocate should not clobber errno, but
+	 * _filelengthi64 might set errno.
+	 */
+	int orig_errno = errno;
+
+	__int64 current_size = _filelengthi64(fd);
+
+	int file_length_errno = errno;
+	errno = orig_errno;
+
+	if (current_size < 0)
+		return file_length_errno;
+
+	__int64 requested_size = offset + len;
+
+	if (requested_size <= current_size)
 		return 0;
 
-	return _chsize_s(fd, size);
+	return _chsize_s(fd, requested_size);
 }
 
 /*

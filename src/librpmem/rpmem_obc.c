@@ -1,5 +1,5 @@
 /*
- * Copyright 2016, Intel Corporation
+ * Copyright 2016-2017, Intel Corporation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -140,7 +140,7 @@ rpmem_obc_close_conn(struct rpmem_obc *rpc)
 {
 	rpmem_ssh_close(rpc->ssh);
 
-	rpc->ssh = NULL;
+	(void) __sync_fetch_and_and(&rpc->ssh, 0);
 }
 
 /*
@@ -342,6 +342,20 @@ rpmem_obc_check_close_resp(struct rpmem_msg_close_resp *resp)
 {
 	if (rpmem_obc_check_hdr_resp(&resp->hdr, RPMEM_MSG_TYPE_CLOSE_RESP,
 			sizeof(struct rpmem_msg_close_resp)))
+		return -1;
+
+	return 0;
+}
+
+/*
+ * rpmem_obc_check_set_attr_resp -- (internal) check set attributes response
+ * message
+ */
+static int
+rpmem_obc_check_set_attr_resp(struct rpmem_msg_set_attr_resp *resp)
+{
+	if (rpmem_obc_check_hdr_resp(&resp->hdr, RPMEM_MSG_TYPE_SET_ATTR_RESP,
+			sizeof(struct rpmem_msg_set_attr_resp)))
 		return -1;
 
 	return 0;
@@ -579,6 +593,63 @@ err_msg_send:
 	free(msg);
 err_alloc_msg:
 err_req:
+err_notconnected:
+	return -1;
+}
+
+/*
+ * rpmem_obc_set_attr -- perform set attributes request operation
+ *
+ * Returns error if connection is not already established.
+ */
+int
+rpmem_obc_set_attr(struct rpmem_obc *rpc,
+	const struct rpmem_pool_attr *pool_attr)
+{
+	if (!rpmem_obc_is_connected(rpc)) {
+		ERR("out-of-band connection not established");
+		errno = ENOTCONN;
+		goto err_notconnected;
+	}
+
+	struct rpmem_msg_set_attr msg;
+	rpmem_obc_set_msg_hdr(&msg.hdr, RPMEM_MSG_TYPE_SET_ATTR, sizeof(msg));
+	if (pool_attr) {
+		memcpy(&msg.pool_attr, pool_attr, sizeof(msg.pool_attr));
+	} else {
+		RPMEM_LOG(INFO, "using zeroed pool attributes");
+		memset(&msg.pool_attr, 0, sizeof(msg.pool_attr));
+	}
+
+	RPMEM_LOG(INFO, "sending set attributes request message");
+
+	rpmem_hton_msg_set_attr(&msg);
+	if (rpmem_ssh_send(rpc->ssh, &msg, sizeof(msg))) {
+		ERR("!sending set attributes request message failed");
+		goto err_msg_send;
+	}
+
+	RPMEM_LOG(NOTICE, "set attributes request message sent");
+	RPMEM_LOG(INFO, "receiving set attributes request response");
+
+	struct rpmem_msg_set_attr_resp resp;
+	if (rpmem_ssh_recv(rpc->ssh, &resp,
+			sizeof(resp))) {
+		ERR("!receiving set attributes request response failed");
+		goto err_msg_recv;
+	}
+
+	RPMEM_LOG(NOTICE, "set attributes request response received");
+
+	rpmem_ntoh_msg_set_attr_resp(&resp);
+
+	if (rpmem_obc_check_set_attr_resp(&resp))
+		goto err_msg_resp;
+
+	return 0;
+err_msg_resp:
+err_msg_recv:
+err_msg_send:
 err_notconnected:
 	return -1;
 }

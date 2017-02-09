@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016, Intel Corporation
+ * Copyright 2015-2017, Intel Corporation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -36,14 +36,15 @@
 
 #include "benchmark.hpp"
 #include "libpmemblk.h"
-#include <assert.h>
-#include <errno.h>
+#include "os.h"
+#include <cassert>
+#include <cerrno>
+#include <cstdint>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <fcntl.h>
 #include <pthread.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <unistd.h>
 
 struct blk_bench;
@@ -226,7 +227,7 @@ blk_init_worker(struct benchmark *bench, struct benchmark_args *args,
 	/* fill buffer with some random data */
 	memset(bworker->buff, bworker->seed, args->dsize);
 
-	bworker->blocks = (off_t *)malloc(sizeof(bworker->blocks) *
+	bworker->blocks = (off_t *)malloc(sizeof(*bworker->blocks) *
 					  args->n_ops_per_thread);
 	if (!bworker->blocks) {
 		perror("malloc");
@@ -326,7 +327,7 @@ blk_init(struct blk_bench *bb, struct benchmark_args *args)
 #ifdef _WIN32
 		flags |= O_BINARY;
 #endif
-		bb->fd = open(args->fname, flags, args->fmode);
+		bb->fd = os_open(args->fname, flags, args->fmode);
 		if (bb->fd < 0) {
 			perror("open");
 			return -1;

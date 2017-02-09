@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016, Intel Corporation
+ * Copyright 2015-2017, Intel Corporation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -38,6 +38,7 @@
 #define _GNU_SOURCE
 #endif
 
+#include <inttypes.h>
 #include <errno.h>
 #include <limits.h>
 #include <pthread.h>
@@ -293,7 +294,7 @@ lane_recover_and_section_boot(PMEMobjpool *pop)
 				sizeof(layout->sections[i]));
 
 			if (err != 0) {
-				LOG(2, "section_ops->recover %d %ju %d",
+				LOG(2, "section_ops->recover %d %" PRIu64 " %d",
 					i, j, err);
 				return err;
 			}
@@ -326,7 +327,7 @@ lane_check(PMEMobjpool *pop)
 					sizeof(layout->sections[i]));
 
 			if (err) {
-				LOG(2, "section_ops->check %d %ju %d",
+				LOG(2, "section_ops->check %d %" PRIu64 " %d",
 					i, j, err);
 
 				return err;

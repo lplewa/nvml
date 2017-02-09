@@ -1,5 +1,5 @@
 #
-# Copyright 2015-2016, Intel Corporation
+# Copyright 2015-2017, Intel Corporation
 # Copyright (c) 2016, Microsoft Corporation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -54,7 +54,7 @@ require_build_type debug nondebug
 
 setup
 
-expect_normal_exit $Env:EXE_DIR\obj_sync$Env:EXESUFFIX m 50 300
+expect_normal_exit $Env:EXE_DIR\obj_sync$Env:EXESUFFIX m 50 5
 
 check
 

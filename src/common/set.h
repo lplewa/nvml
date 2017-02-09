@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2016, Intel Corporation
+ * Copyright 2014-2017, Intel Corporation
  * Copyright (c) 2016, Microsoft Corporation. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -125,14 +125,29 @@ struct pool_attr {
 	const unsigned char *user_flags;	/* user flags */
 };
 
+/* get (r)th replica */
 #define REP(set, r)\
 	((set)->replica[((set)->nreplicas + (r)) % (set)->nreplicas])
+/* get (r + 1)th replica */
+#define REPN(set, r)\
+	((set)->replica[((set)->nreplicas + (r) + 1) % (set)->nreplicas])
+/* get (r - 1)th replica */
+#define REPP(set, r)\
+	((set)->replica[((set)->nreplicas + (r) - 1) % (set)->nreplicas])
 
 #define PART(rep, p)\
 	((rep)->part[((rep)->nparts + (p)) % (rep)->nparts])
+#define PARTN(rep, p)\
+	((rep)->part[((rep)->nparts + (p) + 1) % (rep)->nparts])
+#define PARTP(rep, p)\
+	((rep)->part[((rep)->nparts + (p) - 1) % (rep)->nparts])
 
 #define HDR(rep, p)\
 	((struct pool_hdr *)(PART(rep, p).hdr))
+#define HDRN(rep, p)\
+	((struct pool_hdr *)(PARTN(rep, p).hdr))
+#define HDRP(rep, p)\
+	((struct pool_hdr *)(PARTP(rep, p).hdr))
 
 int util_poolset_parse(struct pool_set **setp, const char *path, int fd);
 int util_poolset_read(struct pool_set **setp, const char *path);
@@ -161,6 +176,12 @@ int util_pool_create_uuids(struct pool_set **setp, const char *path,
 int util_part_open(struct pool_set_part *part, size_t minsize, int create);
 void util_part_fdclose(struct pool_set_part *part);
 int util_replica_open(struct pool_set *set, unsigned repidx, int flags);
+int util_replica_set_attr(struct pool_replica *rep, const char *sig,
+	uint32_t major, uint32_t compat, uint32_t incompat, uint32_t ro_compat,
+	const unsigned char *poolset_uuid, const unsigned char *uuid,
+	const unsigned char *next_repl_uuid,
+	const unsigned char *prev_repl_uuid,
+	const unsigned char *arch_flags);
 int util_replica_close(struct pool_set *set, unsigned repidx);
 int util_map_part(struct pool_set_part *part, void *addr, size_t size,
 	size_t offset, int flags, int rdonly);

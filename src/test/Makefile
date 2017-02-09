@@ -1,5 +1,5 @@
 #
-# Copyright 2014-2016, Intel Corporation
+# Copyright 2014-2017, Intel Corporation
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -94,6 +94,7 @@ OBJ_TESTS = \
 	obj_pmalloc_basic\
 	obj_pmalloc_mt\
 	obj_pmalloc_oom_mt\
+	obj_pmalloc_rand_mt\
 	obj_pool\
 	obj_pool_lock\
 	obj_pool_lookup\
@@ -137,7 +138,24 @@ OBJ_CPP_TESTS = \
 	obj_cpp_make_persistent_atomic\
 	obj_cpp_make_persistent_array\
 	obj_cpp_make_persistent_array_atomic\
-	obj_cpp_transaction
+	obj_cpp_transaction\
+	obj_cpp_allocator
+
+OBJ_CPP_CONTAINER_TESTS = \
+	obj_cpp_vector\
+	obj_cpp_deque\
+	obj_cpp_list\
+	obj_cpp_set\
+	obj_cpp_multiset\
+	obj_cpp_unordered_multiset\
+	obj_cpp_unordered_set\
+	obj_cpp_map\
+	obj_cpp_multimap\
+	obj_cpp_unordered_map\
+	obj_cpp_unordered_multimap\
+	obj_cpp_queue\
+	obj_cpp_priority_queue\
+	obj_cpp_stack
 
 CHRONO_TESTS = \
 	obj_cpp_mutex\
@@ -177,7 +195,7 @@ OTHER_TESTS = \
 PMEM_TESTS = \
 	pmem_is_pmem\
 	pmem_is_pmem_proc_linux\
-	pmem_map\
+	pmem_map_file\
 	pmem_memcpy\
 	pmem_memmove\
 	pmem_memset\
@@ -260,7 +278,8 @@ LIBPMEMPOOL_DEPS = libpmempool_api
 LIBPMEMPOOL_TESTS = \
 	libpmempool_backup\
 	libpmempool_bttdev\
-	libpmempool_map_flog
+	libpmempool_map_flog\
+	libpmempool_rm
 
 LIBPMEMPOOL_MOD_DEPS = \
 	libpmempool_sync
@@ -306,6 +325,13 @@ else
 $(info NOTE: Skipping C++ tests because the compiler does not support C++11)
 endif
 
+# enable only when using custom standard libraries
+ifneq (,$(filter 1, $(USE_CUSTOM_GCC) $(USE_LLVM_LIBCPP)))
+LOCAL_TESTS += $(OBJ_CPP_CONTAINER_TESTS)
+else
+$(info NOTE: Skipping C++ container tests becasue a custom version of the standard library is not used)
+endif
+
 TESTS = \
 	$(LOCAL_TESTS)\
 	$(REMOTE_TESTS)
@@ -330,8 +356,6 @@ DIR_SYNC=$(TOP)/src/test/.sync-dir
 SYNC_EXT=synced
 
 all test cstyle format: $(TESTS_BUILD)
-
-test: sync-remotes
 
 clean clobber: $(TESTS_BUILD)
 	$(RM) -r $(DIR_SYNC)
@@ -367,8 +391,10 @@ check: test
 	@./RUNTESTS $(RUNTEST_OPTIONS) $(TESTS)
 	@echo "No failures."
 
-check-remote-quiet: test
+check-remote-quiet: sync-remotes
 	@./RUNTESTS $(RUNTEST_OPTIONS) $(REMOTE_TESTS)
+
+sync-remotes: test
 
 check-remote: check-remote-quiet
 	@echo "No failures."

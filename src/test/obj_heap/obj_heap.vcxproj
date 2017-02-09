@@ -16,7 +16,11 @@
     <ClCompile Include="..\..\libpmemobj\heap.c" />
     <ClCompile Include="..\..\libpmemobj\memblock.c" />
     <ClCompile Include="..\..\libpmemobj\memops.c" />
+    <ClCompile Include="..\..\libpmemobj\recycler.c" />
     <ClCompile Include="..\..\libpmemobj\redo.c" />
+    <ClCompile Include="..\..\libpmemobj\container_ctree.c" />
+    <ClCompile Include="..\..\libpmemobj\container_seglists.c" />
+    <ClCompile Include="..\..\libpmemobj\alloc_class.c" />
     <ClCompile Include="obj_heap.c" />
   </ItemGroup>
   <ItemGroup>
@@ -47,12 +51,14 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>false</WholeProgramOptimization>
+    <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">

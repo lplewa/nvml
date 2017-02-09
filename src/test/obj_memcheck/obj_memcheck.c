@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016, Intel Corporation
+ * Copyright 2015-2017, Intel Corporation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -67,6 +67,31 @@ test_memcheck_bug()
 	VALGRIND_MEMPOOL_ALLOC(tmp, tmp + 8, 16);
 	VALGRIND_MAKE_MEM_NOACCESS(tmp, 8);
 	tmp[7] = 0x66;
+#endif
+}
+
+static void
+test_memcheck_bug2()
+{
+#if defined(USE_VG_MEMCHECK) || defined(USE_VALGRIND)
+	volatile char tmp[1000];
+
+	VALGRIND_CREATE_MEMPOOL(tmp, 0, 0);
+
+	VALGRIND_MEMPOOL_ALLOC(tmp, tmp + 128, 128);
+	VALGRIND_MEMPOOL_FREE(tmp, tmp + 128);
+
+	VALGRIND_MEMPOOL_ALLOC(tmp, tmp + 256, 128);
+	VALGRIND_MEMPOOL_FREE(tmp, tmp + 256);
+
+	/*
+	 * This should produce warning:
+	 * Address ... is 0 bytes inside a block of size 128 bytes freed.
+	 * instead, it produces a warning:
+	 * Address ... is 0 bytes after a block of size 128 freed
+	 */
+	int *data = (int *)(tmp + 256);
+	*data = 0x66;
 #endif
 }
 
@@ -167,6 +192,8 @@ main(int argc, char *argv[])
 		test_everything(argv[2]);
 	} else
 		usage(argv[0]);
+
+	test_memcheck_bug2();
 
 	DONE(NULL);
 }

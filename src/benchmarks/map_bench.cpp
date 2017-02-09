@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016, Intel Corporation
+ * Copyright 2015-2017, Intel Corporation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,7 +33,7 @@
  * map_bench.cpp -- benchmarks for: ctree, btree, rtree, rbtree, hashmap_atomic
  * and hashmap_tx from examples.
  */
-#include <assert.h>
+#include <cassert>
 #include <pthread.h>
 
 #include "benchmark.hpp"
@@ -539,8 +539,9 @@ map_common_init(struct benchmark *bench, struct benchmark_args *args)
 
 	map_bench->nkeys = args->n_threads * args->n_ops_per_thread;
 	map_bench->init_nkeys = map_bench->nkeys;
-	size_per_key = map_bench->margs->alloc ? SIZE_PER_KEY : SIZE_PER_KEY +
-			map_bench->args->dsize + ALLOC_OVERHEAD;
+	size_per_key = map_bench->margs->alloc
+		? SIZE_PER_KEY + map_bench->args->dsize + ALLOC_OVERHEAD
+		: SIZE_PER_KEY;
 
 	map_bench->pool_size = map_bench->nkeys * size_per_key * FACTOR;
 

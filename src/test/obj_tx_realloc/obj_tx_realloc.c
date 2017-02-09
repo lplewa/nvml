@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016, Intel Corporation
+ * Copyright 2015-2017, Intel Corporation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -89,6 +89,8 @@ do_tx_alloc(PMEMobjpool *pop, int type_num, size_t value)
 		if (!TOID_IS_NULL(obj)) {
 			D_RW(obj)->value = value;
 		}
+	} TX_ONABORT {
+		UT_ASSERT(0);
 	} TX_END
 
 	return obj.oid;

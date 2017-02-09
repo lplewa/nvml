@@ -1,4 +1,4 @@
-# Copyright 2016, Intel Corporation
+# Copyright 2016-2017, Intel Corporation
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -51,6 +51,7 @@ SOURCE =\
 	$(COMMON)/mmap_linux.c\
 	$(COMMON)/pool_hdr.c\
 	$(COMMON)/pool_hdr_linux.c\
+	$(COMMON)/os_linux.c\
 	$(COMMON)/out.c\
 	$(COMMON)/set.c\
 	$(COMMON)/util.c\
@@ -73,7 +74,8 @@ SOURCE =\
 	rpmem_cmd.c\
 	rpmem_util.c\
 	sync.c\
-	transform.c
+	transform.c\
+	rm.c
 
 LIBPMEMBLK_PRIV_FUNCS=btt_info_set btt_arena_datasize btt_flog_size\
 	btt_map_size btt_flog_get_valid map_entry_is_initial btt_info_convert2h\

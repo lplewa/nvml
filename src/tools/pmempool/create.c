@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2016, Intel Corporation
+ * Copyright 2014-2017, Intel Corporation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -46,6 +46,7 @@
 #include <libgen.h>
 #include <err.h>
 #include "common.h"
+#include "file.h"
 #include "create.h"
 
 #include "set.h"
@@ -520,13 +521,16 @@ pmempool_create_func(char *appname, int argc, char *argv[])
 					pc.inherit_params.blk.bsize;
 			break;
 		case PMEM_POOL_TYPE_OBJ:
-			if (!pc.layout)
+			if (!pc.layout) {
 				memcpy(pc.params.obj.layout,
 					pc.inherit_params.obj.layout,
 					sizeof(pc.params.obj.layout));
-			else
+			} else {
+				size_t len = sizeof(pc.params.obj.layout);
 				strncpy(pc.params.obj.layout, pc.layout,
-					sizeof(pc.params.obj.layout));
+						len - 1);
+				pc.params.obj.layout[len - 1] = '\0';
+			}
 			break;
 		default:
 			break;
@@ -590,7 +594,7 @@ pmempool_create_func(char *appname, int argc, char *argv[])
 	if (ret) {
 		outv_err("creating pool file failed\n");
 		if (!pc.fexists)
-			(void) remove(pc.fname);
+			util_unlink(pc.fname);
 	}
 
 	util_options_free(pc.opts);

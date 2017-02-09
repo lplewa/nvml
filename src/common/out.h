@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2016, Intel Corporation
+ * Copyright 2014-2017, Intel Corporation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -47,7 +47,7 @@
  * Suppress errors which are after appropriate ASSERT* macro for nondebug
  * builds.
  */
-#if !defined(DEBUG) && defined(__clang_analyzer__)
+#if !defined(DEBUG) && (defined(__clang_analyzer__) || defined(__COVERITY__))
 #define OUT_FATAL_DISCARD_NORETURN __attribute__((noreturn))
 #else
 #define OUT_FATAL_DISCARD_NORETURN
@@ -205,6 +205,17 @@ void out_fatal(const char *file, int line, const char *func,
 void out_set_print_func(void (*print_func)(const char *s));
 void out_set_vsnprintf_func(int (*vsnprintf_func)(char *str, size_t size,
 	const char *format, va_list ap));
+
+#ifdef _WIN32
+#ifdef UNICODE
+#define out_get_errormsg out_get_errormsgW
+#else
+#define out_get_errormsg out_get_errormsgU
+#endif
+const wchar_t *out_get_errormsgW(void);
+const char *out_get_errormsgU(void);
+#else
 const char *out_get_errormsg(void);
+#endif
 
 #endif

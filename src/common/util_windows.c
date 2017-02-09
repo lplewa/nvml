@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016, Intel Corporation
+ * Copyright 2015-2017, Intel Corporation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -108,4 +108,85 @@ void
 util_aligned_free(void *ptr)
 {
 	_aligned_free(ptr);
+}
+
+/*
+ * util_toUTF8 -- XXX
+ */
+utf8_t *
+util_toUTF8(const wchar_t *wstr)
+{
+	int size = WideCharToMultiByte(CP_UTF8, 0, wstr, -1,
+		NULL, 0, NULL, NULL);
+	if (size == 0) {
+		errno = EINVAL;
+		return NULL;
+	}
+
+	utf8_t *str = Malloc(size * sizeof(utf8_t));
+	if (str == NULL) {
+		errno = ENOMEM;
+		return NULL;
+	}
+
+	if (WideCharToMultiByte(CP_UTF8, 0, wstr, -1, str, size,
+		NULL, NULL) == 0) {
+		Free(str);
+		errno = EINVAL;
+		return NULL;
+	}
+
+	return str;
+}
+
+/*
+ * util_toUTF16 -- XXX
+ */
+utf16_t *
+util_toUTF16(const utf8_t *wstr)
+{
+	int size = MultiByteToWideChar(CP_UTF8, 0, wstr, -1, NULL, 0);
+	if (size == 0) {
+		errno = EINVAL;
+		return NULL;
+	}
+
+	utf16_t *str = Malloc(size * sizeof(utf16_t));
+	if (str == NULL) {
+		errno = ENOMEM;
+		return NULL;
+	}
+
+	if (MultiByteToWideChar(CP_UTF8, 0, wstr, -1, str, size) == 0) {
+		Free(str);
+		errno = EINVAL;
+		return NULL;
+	}
+
+	return str;
+}
+
+/*
+* util_toUTF16 -- XXX user responsible for supplying a large enough out buffer.
+*/
+int
+util_toUTF16_inplace(const utf8_t *in, utf16_t *out)
+{
+	if (out == NULL) {
+		errno = EINVAL;
+		return -1;
+	}
+
+	int size = MultiByteToWideChar(CP_UTF8, 0, in, -1, NULL, 0);
+	if (size == 0) {
+		errno = EINVAL;
+		return -1;
+	}
+
+	if (MultiByteToWideChar(CP_UTF8, 0, in, -1, out, size) == 0) {
+		errno = EINVAL;
+		return -1;
+	}
+
+	return 0;
 }

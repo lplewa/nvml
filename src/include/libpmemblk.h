@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2016, Intel Corporation
+ * Copyright 2014-2017, Intel Corporation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -82,11 +82,39 @@ const char *pmemblk_check_version(
 
 #define PMEMBLK_MIN_BLK ((size_t)512)
 
+#ifdef _WIN32
+#ifdef UNICODE
+#define pmemblk_open pmemblk_openW
+#define pmemblk_create pmemblk_createW
+#define pmemblk_check pmemblk_checkW
+#define pmemblk_errormsg pmemblk_errormsgW
+
+#else
+#define pmemblk_open pmemblk_openU
+#define pmemblk_create pmemblk_createU
+#define pmemblk_check pmemblk_checkU
+#define pmemblk_errormsg pmemblk_errormsgU
+#endif
+PMEMblkpool *pmemblk_openU(const char *path, size_t bsize);
+PMEMblkpool *pmemblk_createU(const char *path, size_t bsize,
+	size_t poolsize, mode_t mode);
+int pmemblk_checkU(const char *path, size_t bsize);
+const char *pmemblk_errormsgU(void);
+
+PMEMblkpool *pmemblk_openW(const wchar_t *path, size_t bsize);
+PMEMblkpool *pmemblk_createW(const wchar_t *path, size_t bsize,
+	size_t poolsize, mode_t mode);
+int pmemblk_checkW(const wchar_t *path, size_t bsize);
+const wchar_t *pmemblk_errormsgW(void);
+#else
 PMEMblkpool *pmemblk_open(const char *path, size_t bsize);
 PMEMblkpool *pmemblk_create(const char *path, size_t bsize,
-		size_t poolsize, mode_t mode);
-void pmemblk_close(PMEMblkpool *pbp);
+	size_t poolsize, mode_t mode);
 int pmemblk_check(const char *path, size_t bsize);
+const char *pmemblk_errormsg(void);
+#endif
+
+void pmemblk_close(PMEMblkpool *pbp);
 size_t pmemblk_bsize(PMEMblkpool *pbp);
 size_t pmemblk_nblock(PMEMblkpool *pbp);
 int pmemblk_read(PMEMblkpool *pbp, void *buf, long long blockno);
@@ -105,7 +133,7 @@ void pmemblk_set_funcs(
 		void *(*realloc_func)(void *ptr, size_t size),
 		char *(*strdup_func)(const char *s));
 
-const char *pmemblk_errormsg(void);
+
 
 #ifdef __cplusplus
 }

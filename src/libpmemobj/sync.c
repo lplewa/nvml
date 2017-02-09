@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016, Intel Corporation
+ * Copyright 2015-2017, Intel Corporation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,6 +33,8 @@
 /*
  * sync.c -- persistent memory resident synchronization primitives
  */
+
+#include <inttypes.h>
 
 #include "obj.h"
 #include "out.h"
@@ -70,10 +72,17 @@ static void *
 _get_lock(uint64_t pop_runid, volatile uint64_t *runid, void *lock,
 	int (*init_lock)(void *lock, void *arg), size_t size)
 {
-	LOG(15, "pop_runid %ju runid %ju lock %p init_lock %p", pop_runid,
-		*runid, lock, init_lock);
+	LOG(15, "pop_runid %" PRIu64 " runid %" PRIu64 " lock %p init_lock %p",
+		pop_runid, *runid, lock, init_lock);
 
 	ASSERTeq((uintptr_t)runid % util_alignof(uint64_t), 0);
+
+	COMPILE_ERROR_ON(sizeof(PMEMmutex)
+		!= sizeof(PMEMmutex_internal));
+	COMPILE_ERROR_ON(sizeof(PMEMrwlock)
+		!= sizeof(PMEMrwlock_internal));
+	COMPILE_ERROR_ON(sizeof(PMEMcond)
+		!= sizeof(PMEMcond_internal));
 
 	COMPILE_ERROR_ON(util_alignof(PMEMmutex)
 		!= util_alignof(pthread_mutex_t));

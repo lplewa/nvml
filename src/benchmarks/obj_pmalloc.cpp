@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016, Intel Corporation
+ * Copyright 2015-2017, Intel Corporation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -34,13 +34,13 @@
  * obj_pmalloc.cpp -- pmalloc benchmarks definition
  */
 
-#include <assert.h>
-#include <errno.h>
+#include <cassert>
+#include <cerrno>
+#include <cinttypes>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <fcntl.h>
-#include <inttypes.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <unistd.h>
 
 #include "benchmark.hpp"
@@ -240,7 +240,7 @@ pmalloc_op(struct benchmark *bench, struct operation_info *info)
 	uint64_t i = info->index +
 		info->worker->index * info->args->n_ops_per_thread;
 
-	int ret = pmalloc(ob->pop, &ob->offs[i], ob->sizes[i]);
+	int ret = pmalloc(ob->pop, &ob->offs[i], ob->sizes[i], 0, 0);
 	if (ret) {
 		fprintf(stderr, "pmalloc ret: %d\n", ret);
 		return ret;
@@ -280,7 +280,7 @@ pfree_init(struct benchmark *bench, struct benchmark_args *args)
 	struct obj_bench *ob = (struct obj_bench *)pmembench_get_priv(bench);
 
 	for (size_t i = 0; i < args->n_ops_per_thread * args->n_threads; i++) {
-		ret = pmalloc(ob->pop, &ob->offs[i], ob->sizes[i]);
+		ret = pmalloc(ob->pop, &ob->offs[i], ob->sizes[i], 0, 0);
 		if (ret) {
 			fprintf(stderr, "pmalloc at idx %" PRIu64 " ret: %s\n",
 				i, pmemobj_errormsg());

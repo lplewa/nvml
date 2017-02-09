@@ -52,6 +52,60 @@
     <ClCompile Include="..\..\src\libpmemobj\palloc.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\common\file.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\file_windows.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\mmap.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\mmap_windows.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\out.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\pool_hdr.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\pool_hdr_windows.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\pthread_windows.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\set.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\util.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\uuid.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\uuid_windows.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\util_windows.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="recycler.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="container_ctree.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="container_seglists.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="alloc_class.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\os_windows.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\libpmemobj\heap_layout.h">
@@ -178,6 +232,21 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="tx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="recycler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="container.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="container_ctree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="container_seglists.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="alloc_class.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2016, Intel Corporation
+ * Copyright 2014-2017, Intel Corporation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -34,6 +34,7 @@
  * blk.c -- block memory pool entry points for libpmem
  */
 
+#include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
@@ -53,9 +54,9 @@
 #include "out.h"
 #include "btt.h"
 #include "blk.h"
+#include "util.h"
 #include "sys_util.h"
 #include "valgrind_internal.h"
-
 /*
  * lane_enter -- (internal) acquire a unique lane number
  */
@@ -92,11 +93,11 @@ nsread(void *ns, unsigned lane, void *buf, size_t count, uint64_t off)
 {
 	struct pmemblk *pbp = (struct pmemblk *)ns;
 
-	LOG(13, "pbp %p lane %u count %zu off %ju", pbp, lane, count, off);
+	LOG(13, "pbp %p lane %u count %zu off %" PRIu64, pbp, lane, count, off);
 
 	if (off + count > pbp->datasize) {
 		ERR("offset + count (%zu) past end of data area (%zu)",
-				off + count, pbp->datasize);
+				(size_t)off + count, pbp->datasize);
 		errno = EINVAL;
 		return -1;
 	}
@@ -118,11 +119,11 @@ nswrite(void *ns, unsigned lane, const void *buf, size_t count,
 {
 	struct pmemblk *pbp = (struct pmemblk *)ns;
 
-	LOG(13, "pbp %p lane %u count %zu off %ju", pbp, lane, count, off);
+	LOG(13, "pbp %p lane %u count %zu off %" PRIu64, pbp, lane, count, off);
 
 	if (off + count > pbp->datasize) {
 		ERR("offset + count (%zu) past end of data area (%zu)",
-				off + count, pbp->datasize);
+				(size_t)off + count, pbp->datasize);
 		errno = EINVAL;
 		return -1;
 	}
@@ -173,13 +174,13 @@ nsmap(void *ns, unsigned lane, void **addrp, size_t len, uint64_t off)
 {
 	struct pmemblk *pbp = (struct pmemblk *)ns;
 
-	LOG(12, "pbp %p lane %u len %zu off %ju", pbp, lane, len, off);
+	LOG(12, "pbp %p lane %u len %zu off %" PRIu64, pbp, lane, len, off);
 
 	ASSERT(((ssize_t)len) >= 0);
 
 	if (off + len >= pbp->datasize) {
 		ERR("offset + len (%zu) past end of data area (%zu)",
-				off + len, pbp->datasize - 1);
+				(size_t)off + len, pbp->datasize - 1);
 		errno = EINVAL;
 		return -1;
 	}
@@ -230,11 +231,11 @@ nszero(void *ns, unsigned lane, size_t count, uint64_t off)
 {
 	struct pmemblk *pbp = (struct pmemblk *)ns;
 
-	LOG(13, "pbp %p lane %u count %zu off %ju", pbp, lane, count, off);
+	LOG(13, "pbp %p lane %u count %zu off %" PRIu64, pbp, lane, count, off);
 
 	if (off + count > pbp->datasize) {
 		ERR("offset + count (%zu) past end of data area (%zu)",
-				off + count, pbp->datasize);
+				(size_t)off + count, pbp->datasize);
 		errno = EINVAL;
 		return -1;
 	}
@@ -393,8 +394,8 @@ err:
  * pmemblk_create -- create a block memory pool
  */
 PMEMblkpool *
-pmemblk_create(const char *path, size_t bsize, size_t poolsize,
-		mode_t mode)
+UNICODE_FUNCTION(pmemblk_create)(const char *path, size_t bsize,
+		size_t poolsize, mode_t mode)
 {
 	LOG(3, "path %s bsize %zu poolsize %zu mode %o",
 			path, bsize, poolsize, mode);
@@ -466,6 +467,24 @@ err:
 	return NULL;
 }
 
+#ifdef _WIN32
+/*
+ * pmemblk_create -- create a block memory pool
+ */
+PMEMblkpool *
+pmemblk_createW(const wchar_t *path, size_t bsize, size_t poolsize,
+	mode_t mode)
+{
+	char *_path = util_toUTF8(path);
+	if (_path == NULL)
+		return NULL;
+
+	PMEMblkpool *ret = pmemblk_createU(_path, bsize, poolsize, mode);
+
+	free(_path);
+	return ret;
+}
+#endif
 
 /*
  * pmemblk_open_common -- (internal) open a block memory pool
@@ -541,12 +560,31 @@ err:
  * pmemblk_open -- open a block memory pool
  */
 PMEMblkpool *
-pmemblk_open(const char *path, size_t bsize)
+UNICODE_FUNCTION(pmemblk_open)(const char *path, size_t bsize)
 {
 	LOG(3, "path %s bsize %zu", path, bsize);
 
 	return pmemblk_open_common(path, bsize, 0);
 }
+
+#ifdef _WIN32
+/*
+ * pmemblk_create -- create a block memory pool
+ */
+PMEMblkpool *
+pmemblk_openW(const wchar_t *path, size_t bsize)
+{
+	char *_path = util_toUTF8(path);
+	if (_path == NULL)
+		return NULL;
+
+	PMEMblkpool *ret = pmemblk_openU(_path, bsize);
+
+	free(_path);
+	return ret;
+}
+#endif
+
 
 /*
  * pmemblk_close -- close a block memory pool
@@ -715,7 +753,7 @@ pmemblk_set_error(PMEMblkpool *pbp, long long blockno)
  * pmemblk_check -- block memory pool consistency check
  */
 int
-pmemblk_check(const char *path, size_t bsize)
+UNICODE_FUNCTION(pmemblk_check)(const char *path, size_t bsize)
 {
 	LOG(3, "path \"%s\" bsize %zu", path, bsize);
 
@@ -731,6 +769,24 @@ pmemblk_check(const char *path, size_t bsize)
 
 	return retval;
 }
+
+#ifdef _WIN32
+/*
+ * pmemblk_createW -- create a block memory pool
+ */
+int
+pmemblk_checkW(const wchar_t *path, size_t bsize)
+{
+	char *_path = util_toUTF8(path);
+	if (_path == NULL)
+		return -1;
+
+	int ret = pmemblk_checkU(_path, bsize);
+
+	free(_path);
+	return ret;
+}
+#endif
 
 
 #ifdef _MSC_VER

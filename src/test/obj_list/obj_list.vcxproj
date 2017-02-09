@@ -50,12 +50,16 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NDEBUG;_CONSOLE;%(PreprocessorDefinitions);WRAP_REAL_PMALLOC</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="..\..\libpmemobj\pvector.c" />
+    <ClCompile Include="..\..\libpmemobj\recycler.c" />
+    <ClCompile Include="..\..\libpmemobj\container_ctree.c" />
+    <ClCompile Include="..\..\libpmemobj\container_seglists.c" />
     <ClCompile Include="..\..\libpmemobj\redo.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">_DEBUG;_CONSOLE;%(PreprocessorDefinitions);WRAP_REAL_REDO</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NDEBUG;_CONSOLE;%(PreprocessorDefinitions);WRAP_REAL_REDO</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="..\..\libpmemobj\sync.c" />
     <ClCompile Include="..\..\libpmemobj\tx.c" />
+    <ClCompile Include="..\..\libpmemobj\alloc_class.c" />
     <ClCompile Include="obj_list.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -91,12 +95,14 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>false</WholeProgramOptimization>
+    <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">

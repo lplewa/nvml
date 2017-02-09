@@ -1,5 +1,5 @@
 /*
- * Copyright 2016, Intel Corporation
+ * Copyright 2016-2017, Intel Corporation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -1253,7 +1253,7 @@ rpmem_fip_process_stop(struct rpmem_fip *fip)
 {
 	int ret;
 
-	fip->closing = 1;
+	__sync_fetch_and_or(&fip->closing, 1);
 
 	void *tret;
 	ret = pthread_join(fip->process_thread, &tret);
@@ -1290,11 +1290,22 @@ rpmem_fip_persist(struct rpmem_fip *fip, size_t offset, size_t len,
 		return 0;
 	}
 
-	int ret = fip->ops->persist(fip, offset, len, lane);
-	if (ret) {
-		RPMEM_LOG(ERR, "persist operation failed");
-	}
 
+	int ret = 0;
+	while (len > 0) {
+		size_t tmp_len = len < fip->fi->ep_attr->max_msg_size ?
+			len : fip->fi->ep_attr->max_msg_size;
+
+		ret = fip->ops->persist(fip, offset, tmp_len, lane);
+		if (ret) {
+			RPMEM_LOG(ERR, "persist operation failed");
+			goto err;
+		}
+
+		offset += tmp_len;
+		len -= tmp_len;
+	}
+err:
 	return ret;
 }
 
@@ -1319,6 +1330,12 @@ rpmem_fip_read(struct rpmem_fip *fip, void *buff, size_t len, size_t off)
 
 		ret = rpmem_fip_readmsg(fip->ep, &fip->rd_lane.read,
 				fip->rd_buff, rd_len, raddr);
+		if (ret) {
+			RPMEM_FI_ERR(ret, "RMA read");
+			errno = ret;
+			return -1;
+		}
+
 		VALGRIND_DO_MAKE_MEM_DEFINED(fip->rd_buff, rd_len);
 
 		ret = rpmem_fip_lane_wait(&fip->rd_lane.lane, FI_READ);

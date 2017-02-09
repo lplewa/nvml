@@ -1,5 +1,5 @@
 /*
- * Copyright 2016, Intel Corporation
+ * Copyright 2016-2017, Intel Corporation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -381,7 +381,7 @@ parse_config_file(const char *filename, struct rpmemd_config *config,
 	struct rpmemd_special_chars_pos pos;
 
 	do {
-		memset(&pos, INT32_MAX, sizeof(pos));
+		memset(&pos, 0xff, sizeof(pos));
 		if (get_config_line(file, &line, &line_max,
 			&line_max_increased, &pos) != 0)
 			goto error;
@@ -443,9 +443,6 @@ parse_cl_args(int argc, char *argv[], struct rpmemd_config *config,
 
 	while ((opt = getopt_long(argc, argv, optstr, options,
 		&option_index)) != -1) {
-
-		if (opt == -1)
-			break;
 
 		switch (opt) {
 		case 'c':

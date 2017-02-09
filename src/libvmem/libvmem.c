@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2016, Intel Corporation
+ * Copyright 2014-2017, Intel Corporation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -87,6 +87,17 @@ vmem_set_funcs(
 	out_set_print_func(print_func);
 	je_vmem_pool_set_alloc_funcs(malloc_func, free_func);
 }
+
+#ifdef _WIN32
+/*
+* vmem_errormsgW -- return last error message as unicode
+*/
+const wchar_t *
+vmem_errormsgW(void)
+{
+	return out_get_errormsgW();
+}
+#endif
 
 /*
  * vmem_errormsg -- return last error message

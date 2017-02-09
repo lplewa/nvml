@@ -1,5 +1,5 @@
 /*
- * Copyright 2016, Intel Corporation
+ * Copyright 2016-2017, Intel Corporation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -567,7 +567,7 @@ rpmem_close(RPMEMpool *rpp)
 {
 	RPMEM_LOG(INFO, "closing out-of-band connection");
 
-	rpp->closing = 1;
+	__sync_fetch_and_or(&rpp->closing, 1);
 
 	rpmem_fip_process_stop(rpp->fip);
 
@@ -636,6 +636,27 @@ rpmem_read(RPMEMpool *rpp, void *buff, size_t offset, size_t length)
 }
 
 /*
+ * rpmem_set_attr -- overwrite pool attributes on the remote node
+ *
+ * rpp           -- remote pool handle
+ * attr          -- new pool attributes for the pool on remote node
+ */
+int
+rpmem_set_attr(RPMEMpool *rpp, const struct rpmem_pool_attr *attr)
+{
+	if (unlikely(rpp->error)) {
+		errno = rpp->error;
+		return -1;
+	}
+
+	int ret = rpmem_obc_set_attr(rpp->obc, attr);
+	if (ret) {
+		RPMEM_LOG(ERR, "!set attributes request failed");
+	}
+	return ret;
+}
+
+/*
  * rpmem_remove -- remove pool from remote node
  *
  * target        -- target node in format [<user>@]<target_name>[:<port>]
@@ -683,7 +704,6 @@ rpmem_remove(const char *target, const char *pool_set, int flags)
 	ret = rpmem_ssh_monitor(ssh, 0);
 	if (ret) {
 		ERR("!waiting for remote command failed");
-		ret = -1;
 		goto err_ssh_monitor;
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2016, Intel Corporation
+ * Copyright 2014-2017, Intel Corporation
  * Copyright (c) 2016, Microsoft Corporation. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -47,6 +47,8 @@ extern "C" {
 #include <stdio.h>
 #include <ctype.h>
 
+#include <sys/param.h>
+
 extern unsigned long long Pagesize;
 extern unsigned long long Mmap_align;
 
@@ -63,6 +65,12 @@ extern unsigned long long Mmap_align;
 
 #define util_alignof(t) offsetof(struct {char _util_c; t _util_m; }, _util_m)
 
+#ifdef _WIN32
+#define UNICODE_FUNCTION(A) A##U
+#else
+#define UNICODE_FUNCTION(A) A
+#endif
+
 /*
  * overridable names for malloc & friends used by this library
  */
@@ -70,6 +78,9 @@ typedef void *(*Malloc_func)(size_t size);
 typedef void (*Free_func)(void *ptr);
 typedef void *(*Realloc_func)(void *ptr, size_t size);
 typedef char *(*Strdup_func)(const char *s);
+
+typedef char utf8_t;
+typedef unsigned short utf16_t;
 
 extern Malloc_func Malloc;
 extern Free_func Free;
@@ -86,6 +97,12 @@ char *util_realpath(const char *path);
 int util_compare_file_inodes(const char *path1, const char *path2);
 void *util_aligned_malloc(size_t alignment, size_t size);
 void util_aligned_free(void *ptr);
+
+#ifdef _WIN32
+utf8_t *util_toUTF8(const utf16_t *wstr);
+utf16_t *util_toUTF16(const utf8_t *wstr);
+int util_toUTF16_inplace(const utf8_t *in, utf16_t *out);
+#endif
 
 #define UTIL_MAX_ERR_MSG 128
 void util_strerror(int errnum, char *buff, size_t bufflen);

@@ -1,5 +1,5 @@
 #
-# Copyright 2015-2016, Intel Corporation
+# Copyright 2015-2017, Intel Corporation
 # Copyright (c) 2016, Microsoft Corporation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -295,7 +295,7 @@ function require_pmem {
 #
 function create_poolset {
     $psfile = $args[0]
-    echo "PMEMPOOLSET" | out-file -encoding ASCII $psfile
+    echo "PMEMPOOLSET" | out-file -encoding utf8 $psfile
     for ($i=1;$i -lt $args.count;$i++) {
         if ($args[$i] -eq "M" -Or $args[$i] -eq 'm') { # remote replica
             $i++
@@ -303,11 +303,11 @@ function create_poolset {
             $fparms = ($cmd.Split("{:}"))
             $node = $fparms[0]
             $desc = $fparms[1]
-            echo "REPLICA $node $desc" | out-file -Append -encoding ASCII $psfile
+            echo "REPLICA $node $desc" | out-file -Append -encoding utf8 $psfile
             continue
         }
         if ($args[$i] -eq "R" -Or $args[$i] -eq 'r') {
-            echo "REPLICA" | out-file -Append -encoding ASCII $psfile
+            echo "REPLICA" | out-file -Append -encoding utf8 $psfile
             continue
         }
         $cmd = $args[$i]
@@ -354,7 +354,7 @@ function create_poolset {
         #     chmod $mode $fpath
         # fi
 
-        echo "$fsize $fpath" | out-file -Append -encoding ASCII $psfile
+        echo "$fsize $fpath" | out-file -Append -encoding utf8 $psfile
     } # for args
 }
 
@@ -512,28 +512,28 @@ function require_no_superuser {
 function require_test_type() {
     sv -Name req_test_type 1 -Scope Global
 
-    if ($Env:TEST_TYPE -eq 'all') {
+    if ($Env:TYPE -eq 'all') {
         return
     }
 
     for ($i=0;$i -lt $args.count;$i++) {
-        if ($args[$i] -eq $Env:TEST_TYPE) {
+        if ($args[$i] -eq $Env:TYPE) {
             return
         }
-        switch ($Env:TEST_TYPE) {
+        switch ($Env:TYPE) {
             'check' { # "check" is a synonym of "short + medium"
                 if ($args[$i] -eq 'short' -Or $args[$i] -eq 'medium') {
                     return
                 }
             }
             default {
-                if ($args[$i] -eq $Env:TEST_TYPE) {
+                if ($args[$i] -eq $Env:TYPE) {
                     return
                 }
             }
         }
         if (-Not $Env:UNITTEST_QUIET) {
-            echo "${Env:UNITTEST_NAME}: SKIP test-type $Env:TEST_TYPE ($* required)"
+            echo "${Env:UNITTEST_NAME}: SKIP test-type $Env:TYPE ($* required)"
         }
         exit 0
     }
@@ -544,12 +544,12 @@ function require_test_type() {
 #
 function require_build_type {
     for ($i=0;$i -lt $args.count;$i++) {
-        if ($args[$i] -eq $Env:TEST_BUILD) {
+        if ($args[$i] -eq $Env:BUILD) {
             return
         }
 
         if (-Not $Env:UNITTEST_QUIET) {
-            echo "${Env:UNITTEST_NAME}: SKIP build-type $Env:TEST_BUILD ($* required)"
+            echo "${Env:UNITTEST_NAME}: SKIP build-type $Env:BUILD ($* required)"
         }
         exit 0
     }
@@ -586,16 +586,20 @@ function require_binary() {
 #
 # converts file to UTF8 w/o bom encoding
 #
-function convert_files_to_utf8_wo_bom {
-    sv -Name files $args[0]
-    foreach($file in $files) {
-        $content = Get-Content $file
-        $path = (Get-Item -Path ".\" -Verbose).FullName | Join-Path -ChildPath $file
-        if($content -ne $null) {
-            [IO.File]::WriteAllLines($path, $content)
-        }
-    }
-}
+#function convert_files_to_utf8_wo_bom {
+#    sv -Name files $args[0]
+#    foreach($file in $files) {
+#        $content = Get-Content $file
+#        $path = (Get-Item -Path ".\" -Verbose).FullName | Join-Path -ChildPath $file
+#        if($content -ne $null) {
+#            [IO.File]::WriteAllLines($path, $content)
+#        } else {
+#            # recreate as empty file to remove boom
+#            rm -Force -ea si $path
+#            Out-File -InputObject $null -Encoding ascii -FilePath $path
+#        }
+#    }
+#}
 
 #
 # check -- check test results (using .match files)
@@ -612,11 +616,11 @@ function check {
     }
     [string]$listing = Get-ChildItem -File | Where-Object  {$_.Name -match "[^0-9]${Env:UNITTEST_NUM}.log.match"}
     if ($listing) {
-        $outputs = $listing.Split(' ')
-        for($i=0; $i -lt $outputs.Count; $i++) {
-            $outputs[$i] = ([io.fileinfo]$outputs[$i]).basename # remove .match extension
-        }
-        convert_files_to_utf8_wo_bom $outputs
+ #      $outputs = $listing.Split(' ')
+ #      for($i=0; $i -lt $outputs.Count; $i++) {
+ #          $outputs[$i] = ([io.fileinfo]$outputs[$i]).basename # remove .match extension
+ #      }
+ #       convert_files_to_utf8_wo_bom $outputs
         $pinfo = New-Object System.Diagnostics.ProcessStartInfo
         $pinfo.FileName = "perl"
         $pinfo.RedirectStandardError = $true
@@ -651,20 +655,20 @@ function check {
 #
 function pass {
     if ($Env:TM -eq 1) {
-        sv -Name tm (Get-Date -Format G)
-        $tm = "\t\t\t[$tm]"
+        $end_time = $script:tm.Elapsed.ToString('hh\:mm\:ss\.fff') -Replace "^(00:){1,2}",""
+        $script:tm.reset()
     } else {
-        sv -Name tm ""
+        sv -Name end_time $null
     }
 
     sv -Name msg "PASS"
     Write-Host -NoNewline ($Env:UNITTEST_NAME + ": ")
     Write-Host -NoNewline -foregroundcolor green $msg
-    if ($tm) {
-        Write-Host -NoNewline (":" + $tm)
+    if ($end_time) {
+        Write-Host -NoNewline ("`t`t`t" + "[" + $end_time + " s]")
     }
 
-    if ($Env:TEST_FS -ne "none") {
+    if ($Env:FS -ne "none") {
         if (isDir $DIR) {
              rm -Force -Recurse $DIR
         }
@@ -973,7 +977,7 @@ function require_non_pmem {
 function require_fs_type {
     sv -Name req_fs_type 1 -Scope Global
     for ($i=0;$i -lt $args.count;$i++) {
-        if ($args[$i] -eq $Env:TEST_FS) {
+        if ($args[$i] -eq $Env:FS) {
             switch ($REAL_FS) {
                 'pmem' { if (require_pmem) { return } }
                 'non-pmem' { if (require_non_pmem) { return } }
@@ -982,7 +986,7 @@ function require_fs_type {
         }
     }
     if (-Not $Env:UNITTEST_QUIET) {
-        Write-Host "${Env:UNITTEST_NAME}: SKIP fs-type $Env:TEST_FS (not configured)"
+        Write-Host "${Env:UNITTEST_NAME}: SKIP fs-type $Env:FS (not configured)"
     }
     exit 0
 }
@@ -1015,12 +1019,12 @@ function setup {
     }
 
     # fs type "none" must be explicitly enabled
-    if ($Env:TEST_FS -eq "none" -and $req_fs_type -ne "1") {
+    if ($Env:FS -eq "none" -and $req_fs_type -ne "1") {
         exit 0
     }
 
     # fs type "any" must be explicitly enabled
-    if ($Env:TEST_FS -eq "any" -and $req_fs_type -ne "1") {
+    if ($Env:FS -eq "any" -and $req_fs_type -ne "1") {
         exit 0
     }
 
@@ -1035,11 +1039,11 @@ function setup {
         sv -Name MCSTR ""
     }
 
-    Write-Host "${Env:UNITTEST_NAME}: SETUP ($Env:TEST_TYPE\$REAL_FS\$Env:TEST_BUILD$MCSTR)"
+    Write-Host "${Env:UNITTEST_NAME}: SETUP ($Env:TYPE\$REAL_FS\$Env:BUILD$MCSTR)"
 
     rm -Force check_pool_${Env:BUILD}_${Env:UNITTEST_NUM}.log -ErrorAction SilentlyContinue
 
-    if ( $Env:TEST_FS -ne "none") {
+    if ( $Env:FS -ne "none") {
 
         if (isDir $DIR) {
              rm -Force -Recurse $DIR
@@ -1047,7 +1051,9 @@ function setup {
         mkdir $DIR > $null
     }
 
-    if ($TM -eq "1" ) { sv -Name start_time (epoch) }
+    if ($Env:TM -eq "1" ) {
+        $script:tm = [system.diagnostics.stopwatch]::startNew()
+    }
 }
 
 function dump_last_n_lines {
@@ -1093,9 +1099,9 @@ function cmp {
 #######################################################
 
 # defaults
-if (-Not $Env:TEST_TYPE) { $Env:TEST_TYPE = 'check'}
-if (-Not $Env:TEST_FS) { $Env:TEST_FS = 'any'}
-if (-Not $Env:TEST_BUILD) { $Env:TEST_BUILD = 'debug'}
+if (-Not $Env:TYPE) { $Env:TYPE = 'check'}
+if (-Not $Env:FS) { $Env:FS = 'any'}
+if (-Not $Env:BUILD) { $Env:BUILD = 'debug'}
 if (-Not $Env:MEMCHECK) { $Env:MEMCHECK = 'auto'}
 if (-Not $Env:CHECK_POOL) { $Env:CHECK_POOL = '0'}
 if (-Not $Env:VERBOSE) { $Env:VERBOSE = '0'}
@@ -1128,7 +1134,7 @@ $DLLVIEW="$Env:EXE_DIR\dllview$Env:EXESUFFIX"
 #	TEST_LD_LIBRARY_PATH=\usr\lib .\TEST0
 #
 if (-Not $Env:TEST_TYPE_LD_LIBRARY_PATH) {
-    switch -regex ($Env:TEST_BUILD) {
+    switch -regex ($Env:BUILD) {
         'debug' { $Env:TEST_TYPE_LD_LIBRARY_PATH = '..\..\debug' }
         'nondebug' { $Env:TEST_TYPE_LD_LIBRARY_PATH = '..\..\nondebug' }
     }
@@ -1137,8 +1143,8 @@ if (-Not $Env:TEST_TYPE_LD_LIBRARY_PATH) {
 #
 # When running static binary tests, append the build type to the binary
 #
-#switch -wildcard ($Env:TEST_BUILD) {
-#    'static-*' {$Env:EXESUFFIX = '.' + $Env:TEST_BUILD}
+#switch -wildcard ($Env:BUILD) {
+#    'static-*' {$Env:EXESUFFIX = '.' + $Env:BUILD}
 #}
 
 #
@@ -1170,14 +1176,14 @@ if (-Not $Env:UNITTEST_NAME) {
     exit 1
 }
 
-sv -Name REAL_FS $Env:TEST_FS
+sv -Name REAL_FS $Env:FS
 if ($DIR) {
     # if user passed it in...
     sv -Name "DIR" ($DIR + "\" + $curtestdir + $Env:UNITTEST_NUM)
 } else {
     $tail = "\" + $curtestdir + $Env:UNITTEST_NUM
     # choose based on FS env variable
-    switch ($Env:TEST_FS) {
+    switch ($Env:FS) {
         'pmem' { sv -Name DIR ($Env:PMEM_FS_DIR + $tail)
                  if ($Env:PMEM_FS_DIR_FORCE_PMEM -eq "1") {
                      $Env:PMEM_IS_PMEM_FORCE = "1"
@@ -1202,7 +1208,7 @@ if ($DIR) {
             sv -Name DIR "/nul/not_existing_dir/${curtestdir}${Env:UNITTEST_NUM}" }
         default {
             if (-Not $Env:UNITTEST_QUIET) {
-                Write-Host "${Env:UNITTEST_NAME}: SKIP fs-type $Env:TEST_FS (not configured)"
+                Write-Host "${Env:UNITTEST_NAME}: SKIP fs-type $Env:FS (not configured)"
                 exit 0
             }
         }
@@ -1270,3 +1276,14 @@ if (-Not($UT_DUMP_LINES)) {
 }
 
 $Env:CHECK_POOL_LOG_FILE = "check_pool_${Env:BUILD}_${Env:UNITTEST_NUM}.log"
+
+#
+# enable_log_append -- turn on appending to the log files rather than truncating them
+# It also removes all log files created by tests: out*.log, err*.log and trace*.log
+#
+function enable_log_append() {
+	rm -Force -ErrorAction SilentlyContinue "out${Env:UNITTEST_NUM}.log"
+	rm -Force -ErrorAction SilentlyContinue "err${Env:UNITTEST_NUM}.log"
+	rm -Force -ErrorAction SilentlyContinue "trace${Env:UNITTEST_NUM}.log"
+	$Env:UNITTEST_LOG_APPEND=1
+}

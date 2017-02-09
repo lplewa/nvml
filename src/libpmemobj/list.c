@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016, Intel Corporation
+ * Copyright 2015-2017, Intel Corporation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,6 +33,8 @@
 /*
  * list.c -- implementation of persistent atomic lists module
  */
+#include <inttypes.h>
+
 #include "list.h"
 #include "obj.h"
 #include "out.h"
@@ -505,8 +507,6 @@ list_insert_new(PMEMobjpool *pop,
 	ASSERTne(lane_section, NULL);
 	ASSERTne(lane_section->layout, NULL);
 
-	/* increase allocation size by oob header size */
-	size += OBJ_OOB_SIZE;
 	struct lane_list_layout *section =
 		(struct lane_list_layout *)lane_section->layout;
 	struct redo_log *redo = section->redo;
@@ -516,12 +516,12 @@ list_insert_new(PMEMobjpool *pop,
 	if (constructor) {
 		if ((ret = pmalloc_construct(pop,
 				&section->obj_offset, size,
-				constructor, arg))) {
+				constructor, arg, 0, 0))) {
 			ERR("!pmalloc_construct");
 			goto err_pmalloc;
 		}
 	} else {
-		ret = pmalloc(pop, &section->obj_offset, size);
+		ret = pmalloc(pop, &section->obj_offset, size, 0, 0);
 		if (ret) {
 			ERR("!pmalloc");
 			goto err_pmalloc;
@@ -1073,7 +1073,7 @@ lane_list_check(PMEMobjpool *pop, void *data, unsigned length)
 
 	if (section->obj_offset &&
 	    !OBJ_OFF_FROM_HEAP(pop, section->obj_offset)) {
-		ERR("list lane: invalid offset 0x%jx",
+		ERR("list lane: invalid offset 0x%" PRIx64,
 				section->obj_offset);
 
 		return -1;
@@ -1097,7 +1097,7 @@ lane_list_construct_rt(PMEMobjpool *pop)
 static void
 lane_list_destroy_rt(PMEMobjpool *pop, void *rt)
 {
-	/* nop */
+	/* NOP */
 }
 
 /*
@@ -1106,7 +1106,7 @@ lane_list_destroy_rt(PMEMobjpool *pop, void *rt)
 static int
 lane_list_boot(PMEMobjpool *pop)
 {
-	/* nop */
+	/* NOP */
 	return 0;
 }
 

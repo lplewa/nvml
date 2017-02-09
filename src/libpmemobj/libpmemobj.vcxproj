@@ -25,9 +25,27 @@
     <ClCompile Include="..\..\src\libpmemobj\redo.c" />
     <ClCompile Include="..\..\src\libpmemobj\sync.c" />
     <ClCompile Include="..\..\src\libpmemobj\tx.c" />
+    <ClCompile Include="..\common\file.c" />
+    <ClCompile Include="..\common\file_windows.c" />
+    <ClCompile Include="..\common\mmap.c" />
+    <ClCompile Include="..\common\mmap_windows.c" />
+    <ClCompile Include="..\common\os_windows.c" />
+    <ClCompile Include="..\common\out.c" />
+    <ClCompile Include="..\common\pool_hdr.c" />
+    <ClCompile Include="..\common\pool_hdr_windows.c" />
+    <ClCompile Include="..\common\pthread_windows.c" />
+    <ClCompile Include="..\common\set.c" />
+    <ClCompile Include="..\common\util.c" />
+    <ClCompile Include="..\common\util_windows.c" />
+    <ClCompile Include="..\common\uuid.c" />
+    <ClCompile Include="..\common\uuid_windows.c" />
     <ClCompile Include="libpmemobj_main.c" />
     <ClCompile Include="memblock.c" />
     <ClCompile Include="pvector.c" />
+    <ClCompile Include="recycler.c" />
+    <ClCompile Include="container_ctree.c" />
+    <ClCompile Include="container_seglists.c" />
+    <ClCompile Include="alloc_class.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\common\out.h" />
@@ -72,14 +90,16 @@
     <ClInclude Include="pvector.h" />
     <ClInclude Include="sync.h" />
     <ClInclude Include="tx.h" />
+    <ClInclude Include="recycler.h" />
+    <ClInclude Include="container_ctree.h" />
+    <ClInclude Include="container_seglists.h" />
+    <ClInclude Include="container.h" />
+    <ClInclude Include="alloc_class.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="libpmemobj.def" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\common\libpmemcommon.vcxproj">
-      <Project>{492baa3d-0d5d-478e-9765-500463ae69aa}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\libpmem\libpmem.vcxproj">
       <Project>{9e9e3d25-2139-4a5d-9200-18148ddead45}</Project>
     </ProjectReference>
@@ -108,12 +128,14 @@
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>false</WholeProgramOptimization>
     <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">

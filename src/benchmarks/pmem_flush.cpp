@@ -1,5 +1,5 @@
 /*
- * Copyright 2016, Intel Corporation
+ * Copyright 2016-2017, Intel Corporation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,14 +33,14 @@
 /*
  * pmem_flush.cpp -- benchmark implementation for pmem_persist and pmem_msync
  */
-#include <assert.h>
-#include <errno.h>
+#include <cassert>
+#include <cerrno>
+#include <climits>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <fcntl.h>
 #include <libpmem.h>
-#include <limits.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <sys/mman.h>
 #include <unistd.h>
 
@@ -244,7 +244,7 @@ static int
 flush_msync_0(struct pmem_bench *pmb, void *addr, size_t len)
 {
 	void *ptr = align_addr(addr, PAGE_4K);
-	len = align_len(len, addr, PAGE_4K);
+	(void)len;
 
 	msync(ptr, 0, MS_SYNC);
 	return 0;
@@ -425,7 +425,7 @@ pmem_flush_init(struct benchmark *bench, struct benchmark_args *args)
 				  MAP_PRIVATE | MAP_ANON, -1, 0);
 
 	if (pmb->nondirty_addr == MAP_FAILED) {
-		perror("pmem_map1");
+		perror("mmap(1)");
 		goto err_unmap1;
 	}
 
@@ -433,7 +433,7 @@ pmem_flush_init(struct benchmark *bench, struct benchmark_args *args)
 				 MAP_PRIVATE | MAP_ANON, -1, 0);
 
 	if (pmb->invalid_addr == MAP_FAILED) {
-		perror("pmem_map2");
+		perror("mmap(2)");
 		goto err_unmap2;
 	}
 	munmap(pmb->invalid_addr, pmb->fsize);

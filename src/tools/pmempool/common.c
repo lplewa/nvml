@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2016, Intel Corporation
+ * Copyright 2014-2017, Intel Corporation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -59,6 +59,7 @@
 #include "libpmemobj.h"
 #include "btt.h"
 #include "file.h"
+#include "os.h"
 #include "set.h"
 #include "out.h"
 #include "mmap.h"
@@ -226,83 +227,24 @@ util_range_limit(struct range *rangep, struct range limit)
 }
 
 /*
- * util_parse_range_from_to -- parse range string as interval
- */
-static int
-util_parse_range_from_to(char *str, struct range *rangep, struct range entire)
-{
-	char *str1;
-	char sep;
-	char *str2;
-
-	int ret = 0;
-
-	str1 = malloc(strlen(str) + 1);
-	if (str1 == NULL) {
-		ret = -1;
-		goto end;
-	}
-	str2 = malloc(strlen(str) + 1);
-	if (str2 == NULL) {
-		goto nomem;
-	}
-	if (sscanf(str, "%[^-]%c%[^-]", str1, &sep, str2) == 3 &&
-			sep == '-' &&
-			strlen(str) == (strlen(str1) + 1 + strlen(str2))) {
-		if (util_parse_size(str1, &rangep->first) != 0)
-			ret = -1;
-		else if (util_parse_size(str2, &rangep->last) != 0)
-			ret = -1;
-
-		if (rangep->first > rangep->last) {
-			uint64_t tmp = rangep->first;
-			rangep->first = rangep->last;
-			rangep->last = tmp;
-		}
-
-		util_range_limit(rangep, entire);
-	} else {
-		ret = -1;
-	}
-
-
-	free(str2);
-nomem:
-	free(str1);
-end:
-	return ret;
-}
-
-/*
  * util_parse_range_from -- parse range string as interval from specified number
  */
 static int
 util_parse_range_from(char *str, struct range *rangep, struct range entire)
 {
-	char sep;
-	int ret = 0;
-
-	char *str1 = malloc(strlen(str) + 1);
-	if (str1 == NULL)
+	size_t str_len = strlen(str);
+	if (str[str_len - 1] != '-')
 		return -1;
 
-	if (sscanf(str, "%[^-]%c", str1, &sep) == 2 &&
-			sep == '-' &&
-			strlen(str) == (strlen(str1) + 1)) {
-		if (util_parse_size(str1, &rangep->first) == 0) {
-			rangep->last = entire.last;
-			util_range_limit(rangep, entire);
-		} else {
-			ret = -1;
-		}
-	} else {
-		ret = -1;
-	}
+	str[str_len - 1] = '\0';
 
-	if (str1)
-		free(str1);
+	if (util_parse_size(str, &rangep->first))
+		return -1;
 
-	return ret;
+	rangep->last = entire.last;
+	util_range_limit(rangep, entire);
+
+	return 0;
 }
 
 /*
@@ -311,28 +253,17 @@ util_parse_range_from(char *str, struct range *rangep, struct range entire)
 static int
 util_parse_range_to(char *str, struct range *rangep, struct range entire)
 {
-	char sep;
-	int ret = 0;
 
-	char *str1 = malloc(strlen(str) + 1);
-	if (str1 == NULL)
+	if (str[0] != '-' || str[1] == '\0')
 		return -1;
 
-	if (sscanf(str, "%c%[^-]", &sep, str1) == 2 &&
-			sep == '-' &&
-			strlen(str) == (1 + strlen(str1))) {
-		if (util_parse_size(str1, &rangep->last) == 0) {
-			rangep->first = entire.first;
-			util_range_limit(rangep, entire);
-		} else {
-			ret = -1;
-		}
-	} else {
-		ret = -1;
-	}
+	if (util_parse_size(str + 1, &rangep->last))
+		return -1;
 
-	free(str1);
-	return ret;
+	rangep->first = entire.first;
+	util_range_limit(rangep, entire);
+
+	return 0;
 }
 
 /*
@@ -357,15 +288,36 @@ util_parse_range_number(char *str, struct range *rangep, struct range entire)
 static int
 util_parse_range(char *str, struct range *rangep, struct range entire)
 {
-	if (util_parse_range_from_to(str, rangep, entire) == 0)
-		return 0;
-	if (util_parse_range_from(str, rangep, entire) == 0)
-		return 0;
-	if (util_parse_range_to(str, rangep, entire) == 0)
-		return 0;
-	if (util_parse_range_number(str, rangep, entire) == 0)
-		return 0;
-	return -1;
+	char *dash = strchr(str, '-');
+	if (!dash)
+		return util_parse_range_number(str, rangep, entire);
+
+	/* '-' at the beginning */
+	if (dash == str)
+		return util_parse_range_to(str, rangep, entire);
+
+	/* '-' at the end */
+	if (dash[1] == '\0')
+		return util_parse_range_from(str, rangep, entire);
+
+	*dash = '\0';
+	dash++;
+
+	if (util_parse_size(str, &rangep->first))
+		return -1;
+
+	if (util_parse_size(dash, &rangep->last))
+		return -1;
+
+	if (rangep->first > rangep->last) {
+		uint64_t tmp = rangep->first;
+		rangep->first = rangep->last;
+		rangep->last = tmp;
+	}
+
+	util_range_limit(rangep, entire);
+
+	return 0;
 }
 
 /*
@@ -622,8 +574,8 @@ pmem_pool_parse_params(const char *fname, struct pmem_pool_params *paramsp,
 		return -1;
 
 	/* get file size and mode */
-	util_stat_t stat_buf;
-	if (util_fstat(fd, &stat_buf)) {
+	os_stat_t stat_buf;
+	if (os_fstat(fd, &stat_buf)) {
 		close(fd);
 		return -1;
 	}
@@ -1229,36 +1181,6 @@ util_heap_get_bitmap_params(uint64_t block_size, uint64_t *nallocsp,
 }
 
 /*
- * util_plist_nelements -- count number of elements on a list
- */
-size_t
-util_plist_nelements(struct pmemobjpool *pop, struct list_head *headp)
-{
-	size_t i = 0;
-	struct list_entry *entryp;
-	PLIST_FOREACH(entryp, pop, headp)
-		i++;
-	return i;
-}
-
-/*
- * util_plist_get_entry -- return nth element from list
- */
-struct list_entry *
-util_plist_get_entry(struct pmemobjpool *pop,
-	struct list_head *headp, size_t n)
-{
-	struct list_entry *entryp;
-	PLIST_FOREACH(entryp, pop, headp) {
-		if (n == 0)
-			return entryp;
-		n--;
-	}
-
-	return NULL;
-}
-
-/*
  * pool_set_file_open -- opens pool set file or regular file
  */
 struct pool_set_file *
@@ -1274,8 +1196,8 @@ pool_set_file_open(const char *fname,
 	if (!file->fname)
 		goto err;
 
-	util_stat_t buf;
-	if (util_stat(fname, &buf)) {
+	os_stat_t buf;
+	if (os_stat(fname, &buf)) {
 		warn("%s", fname);
 		goto err_free_fname;
 	}
@@ -1293,7 +1215,7 @@ pool_set_file_open(const char *fname,
 			goto err_free_fname;
 		}
 
-		off_t seek_size = util_lseek(fd, 0, SEEK_END);
+		off_t seek_size = os_lseek(fd, 0, SEEK_END);
 		if (seek_size == -1) {
 			outv_err("lseek SEEK_END failed\n");
 			close(fd);
@@ -1325,7 +1247,7 @@ pool_set_file_open(const char *fname,
 
 		/* get modification time from the first part of first replica */
 		const char *path = file->poolset->replica[0]->part[0].path;
-		if (util_stat(path, &buf)) {
+		if (os_stat(path, &buf)) {
 			warn("%s", path);
 			goto err_close_poolset;
 		}

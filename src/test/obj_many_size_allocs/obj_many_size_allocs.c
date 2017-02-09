@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016, Intel Corporation
+ * Copyright 2015-2017, Intel Corporation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -110,6 +110,7 @@ test_lazy_load(PMEMobjpool *pop, const char *path)
 	UT_ASSERTeq(ret, 0);
 }
 
+#define ALLOC_BLOCK_SIZE 64
 #define MAX_BUCKET_MAP_ENTRIES (RUNSIZE / ALLOC_BLOCK_SIZE)
 
 static void

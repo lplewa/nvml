@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016, Intel Corporation
+ * Copyright 2015-2017, Intel Corporation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -42,7 +42,7 @@
 static void
 pmem_drain_nop(void)
 {
-	/* nop */
+	/* NOP */
 }
 
 /*
@@ -199,6 +199,7 @@ FUNC_MOCK_END
  */
 FUNC_MOCK(pmemobj_close, void, PMEMobjpool *pop)
 	FUNC_MOCK_RUN_DEFAULT {
+		redo_log_config_delete(Pop->redo);
 		UT_ASSERTeq(pmem_unmap(Pop, Pop->size), 0);
 		Pop = NULL;
 	}
@@ -237,7 +238,7 @@ FUNC_MOCK(pmemobj_alloc, int, PMEMobjpool *pop, PMEMoid *oidp,
 	FUNC_MOCK_RUN_DEFAULT {
 		PMEMoid oid = {0, 0};
 		oid.pool_uuid_lo = 0;
-		pmalloc(NULL, &oid.off, size);
+		pmalloc(NULL, &oid.off, size, 0, 0);
 		if (oidp) {
 			*oidp = oid;
 			pmemops_persist(&Pop->p_ops, oidp, sizeof(*oidp));

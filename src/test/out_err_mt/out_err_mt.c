@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016, Intel Corporation
+ * Copyright 2015-2017, Intel Corporation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -44,18 +44,18 @@
 #define NUM_THREADS 16
 
 static void
-print_errors(const char *msg)
+print_errors(const wchar_t *msg)
 {
-	UT_OUT("%s", msg);
-	UT_OUT("PMEM: %s", pmem_errormsg());
-	UT_OUT("PMEMOBJ: %s", pmemobj_errormsg());
-	UT_OUT("PMEMLOG: %s", pmemlog_errormsg());
-	UT_OUT("PMEMBLK: %s", pmemblk_errormsg());
+	UT_OUT("%S", msg);
+	UT_OUT("PMEM: %S", pmem_errormsgW());
+	UT_OUT("PMEMOBJ: %S", pmemobj_errormsgW());
+	UT_OUT("PMEMLOG: %S", pmemlog_errormsgW());
+	UT_OUT("PMEMBLK: %S", pmemblk_errormsgW());
 #ifndef _WIN32
 	/* XXX - vmem not implemented in windows yet */
-	UT_OUT("VMEM: %s", vmem_errormsg());
+	UT_OUT("VMEM: %S", vmem_errormsgW());
 #endif
-	UT_OUT("PMEMPOOL: %s", pmempool_errormsg());
+	UT_OUT("PMEMPOOL: %S", pmempool_errormsgW());
 }
 
 static void
@@ -65,29 +65,29 @@ check_errors(int ver)
 	int err_need;
 	int err_found;
 
-	ret = sscanf(pmem_errormsg(),
-		"libpmem major version mismatch (need %d, found %d)",
+	ret = swscanf(pmem_errormsgW(),
+		L"libpmem major version mismatch (need %d, found %d)",
 		&err_need, &err_found);
 	UT_ASSERTeq(ret, 2);
 	UT_ASSERTeq(err_need, ver);
 	UT_ASSERTeq(err_found, PMEM_MAJOR_VERSION);
 
-	ret = sscanf(pmemobj_errormsg(),
-		"libpmemobj major version mismatch (need %d, found %d)",
+	ret = swscanf(pmemobj_errormsgW(),
+		L"libpmemobj major version mismatch (need %d, found %d)",
 		&err_need, &err_found);
 	UT_ASSERTeq(ret, 2);
 	UT_ASSERTeq(err_need, ver);
 	UT_ASSERTeq(err_found, PMEMOBJ_MAJOR_VERSION);
 
-	ret = sscanf(pmemlog_errormsg(),
-		"libpmemlog major version mismatch (need %d, found %d)",
+	ret = swscanf(pmemlog_errormsgW(),
+		L"libpmemlog major version mismatch (need %d, found %d)",
 		&err_need, &err_found);
 	UT_ASSERTeq(ret, 2);
 	UT_ASSERTeq(err_need, ver);
 	UT_ASSERTeq(err_found, PMEMLOG_MAJOR_VERSION);
 
-	ret = sscanf(pmemblk_errormsg(),
-		"libpmemblk major version mismatch (need %d, found %d)",
+	ret = swscanf(pmemblk_errormsgW(),
+		L"libpmemblk major version mismatch (need %d, found %d)",
 		&err_need, &err_found);
 	UT_ASSERTeq(ret, 2);
 	UT_ASSERTeq(err_need, ver);
@@ -95,16 +95,16 @@ check_errors(int ver)
 
 #ifndef _WIN32
 	/* XXX - vmem not implemented in windows yet */
-	ret = sscanf(vmem_errormsg(),
-		"libvmem major version mismatch (need %d, found %d)",
+	ret = swscanf(vmem_errormsgW(),
+		L"libvmem major version mismatch (need %d, found %d)",
 		&err_need, &err_found);
 	UT_ASSERTeq(ret, 2);
 	UT_ASSERTeq(err_need, ver);
 	UT_ASSERTeq(err_found, VMEM_MAJOR_VERSION);
 #endif
 
-	ret = sscanf(pmempool_errormsg(),
-		"libpmempool major version mismatch (need %d, found %d)",
+	ret = swscanf(pmempool_errormsgW(),
+		L"libpmempool major version mismatch (need %d, found %d)",
 		&err_need, &err_found);
 	UT_ASSERTeq(ret, 2);
 	UT_ASSERTeq(err_need, ver);
@@ -146,23 +146,23 @@ run_mt_test(void *(*worker)(void *))
 }
 
 int
-main(int argc, char *argv[])
+wmain(int argc, wchar_t *argv[])
 {
-	START(argc, argv, "out_err_mt");
+	WSTART(argc, argv, "out_err_mt");
 
 	if (argc != 5)
-		UT_FATAL("usage: %s filename1 filename2 filename3 dir",
+		UT_FATAL("usage: %S filename1 filename2 filename3 dir",
 				argv[0]);
 
-	PMEMobjpool *pop = pmemobj_create(argv[1], "test",
+	PMEMobjpool *pop = pmemobj_createW(argv[1], L"test",
 		PMEMOBJ_MIN_POOL, 0666);
-	PMEMlogpool *plp = pmemlog_create(argv[2],
+	PMEMlogpool *plp = pmemlog_createW(argv[2],
 		PMEMLOG_MIN_POOL, 0666);
-	PMEMblkpool *pbp = pmemblk_create(argv[3],
+	PMEMblkpool *pbp = pmemblk_createW(argv[3],
 		128, PMEMBLK_MIN_POOL, 0666);
 #ifndef _WIN32
 	/* XXX - vmem not implemented in windows yet */
-	VMEM *vmp = vmem_create(argv[4], VMEM_MIN_POOL);
+	VMEM *vmp = vmem_createW(argv[4], VMEM_MIN_POOL);
 #endif
 
 	util_init();
@@ -176,7 +176,7 @@ main(int argc, char *argv[])
 	vmem_check_version(10004, 0);
 #endif
 	pmempool_check_version(10005, 0);
-	print_errors("version check");
+	print_errors(L"version check");
 
 	void *ptr = NULL;
 	/*
@@ -186,20 +186,20 @@ main(int argc, char *argv[])
 	VALGRIND_DO_DISABLE_ERROR_REPORTING;
 	pmem_msync(ptr, 1);
 	VALGRIND_DO_ENABLE_ERROR_REPORTING;
-	print_errors("pmem_msync");
+	print_errors(L"pmem_msync");
 
 	pmemlog_append(plp, NULL, PMEMLOG_MIN_POOL);
-	print_errors("pmemlog_append");
+	print_errors(L"pmemlog_append");
 
 	size_t nblock = pmemblk_nblock(pbp);
 	pmemblk_set_error(pbp, nblock + 1);
-	print_errors("pmemblk_set_error");
+	print_errors(L"pmemblk_set_error");
 
 #ifndef _WIN32
 	/* XXX - vmem not implemented in windows yet */
 	VMEM *vmp2 = vmem_create_in_region(NULL, 1);
 	UT_ASSERTeq(vmp2, NULL);
-	print_errors("vmem_create_in_region");
+	print_errors(L"vmem_create_in_region");
 #endif
 
 	run_mt_test(do_test);
@@ -216,7 +216,7 @@ main(int argc, char *argv[])
 	struct pmempool_check_args args = {0, };
 	ppc = pmempool_check_init(&args, sizeof(args) / 2);
 	UT_ASSERTeq(ppc, NULL);
-	print_errors("pmempool_check_init");
+	print_errors(L"pmempool_check_init");
 
 	DONE(NULL);
 }

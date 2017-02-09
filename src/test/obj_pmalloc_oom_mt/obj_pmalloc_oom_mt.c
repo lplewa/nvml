@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016, Intel Corporation
+ * Copyright 2015-2017, Intel Corporation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -39,7 +39,7 @@
 
 #include "unittest.h"
 
-#define TEST_ALLOC_SIZE (131072 - 64) /* last unit size */
+#define TEST_ALLOC_SIZE (32 * 1024)
 #define LAYOUT_NAME "oom_mt"
 
 int allocated;

@@ -1,6 +1,6 @@
 ;;;; Begin Copyright Notice
 ;
-; Copyright 2015-2016, Intel Corporation
+; Copyright 2015-2017, Intel Corporation
 ;
 ; Redistribution and use in source and binary forms, with or without
 ; modification, are permitted provided that the following conditions
@@ -60,7 +60,8 @@ LIBRARY libpmem
 VERSION 1.0
 
 EXPORTS
-	pmem_map_file
+	pmem_map_fileU
+	pmem_map_fileW
 	pmem_unmap
 	pmem_is_pmem
 	pmem_persist
@@ -75,7 +76,8 @@ EXPORTS
 	pmem_memcpy_nodrain
 	pmem_memset_nodrain
 	pmem_check_version
-	pmem_errormsg
+	pmem_errormsgU
+	pmem_errormsgW
 
 	mmap
 	munmap

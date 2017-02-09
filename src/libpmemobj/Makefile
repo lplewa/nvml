@@ -1,4 +1,4 @@
-# Copyright 2014-2016, Intel Corporation
+# Copyright 2014-2017, Intel Corporation
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -40,6 +40,7 @@ SOURCE =\
 	$(COMMON)/file_linux.c\
 	$(COMMON)/mmap.c\
 	$(COMMON)/mmap_linux.c\
+	$(COMMON)/os_linux.c\
 	$(COMMON)/out.c\
 	$(COMMON)/pool_hdr.c\
 	$(COMMON)/pool_hdr_linux.c\
@@ -48,7 +49,10 @@ SOURCE =\
 	$(COMMON)/uuid.c\
 	$(COMMON)/uuid_linux.c\
 	$(COMMON)/util_linux.c\
+	alloc_class.c\
 	bucket.c\
+	container_ctree.c\
+	container_seglists.c\
 	ctree.c\
 	cuckoo.c\
 	heap.c\
@@ -61,6 +65,7 @@ SOURCE =\
 	palloc.c\
 	pmalloc.c\
 	pvector.c\
+	recycler.c\
 	redo.c\
 	sync.c\
 	tx.c

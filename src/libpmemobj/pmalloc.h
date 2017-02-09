@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016, Intel Corporation
+ * Copyright 2015-2017, Intel Corporation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -57,15 +57,20 @@ struct lane_alloc_layout {
 int pmalloc_operation(struct palloc_heap *heap,
 	uint64_t off, uint64_t *dest_off, size_t size,
 	palloc_constr constructor, void *arg,
+	uint64_t extra_field, uint16_t flags,
 	struct operation_context *ctx);
 
-int pmalloc(PMEMobjpool *pop, uint64_t *off, size_t size);
+int pmalloc(PMEMobjpool *pop, uint64_t *off, size_t size,
+	uint64_t extra_field, uint16_t flags);
 int pmalloc_construct(PMEMobjpool *pop, uint64_t *off, size_t size,
-	palloc_constr constructor, void *arg);
+	palloc_constr constructor, void *arg,
+	uint64_t extra_field, uint16_t flags);
 
-int prealloc(PMEMobjpool *pop, uint64_t *off, size_t size);
+int prealloc(PMEMobjpool *pop, uint64_t *off, size_t size,
+	uint64_t extra_field, uint16_t flags);
 int prealloc_construct(PMEMobjpool *pop, uint64_t *off, size_t size,
-	palloc_constr constructor, void *arg);
+	palloc_constr constructor, void *arg,
+	uint64_t extra_field, uint16_t flags);
 
 void pfree(PMEMobjpool *pop, uint64_t *off);
 
