@@ -241,7 +241,16 @@ main(int argc, char *argv[])
 {
 	int opt;
 	int option_index;
-
+#ifdef _WIN32
+	wchar_t **wargv = CommandLineToArgvW(GetCommandLineW(), &argc);
+	for (int i = 0; i < argc; i++) {
+		argv[i] = util_toUTF8(wargv[i]);
+		if (argv[i]) {
+			outv_err("Error during arguments conversion\n");
+			exit(EXIT_FAILURE);
+		}
+	}
+#endif
 	util_init();
 
 #ifndef _WIN32
