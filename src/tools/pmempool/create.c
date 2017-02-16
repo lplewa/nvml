@@ -48,6 +48,7 @@
 #include "common.h"
 #include "file.h"
 #include "create.h"
+#include "os.h"
 
 #include "set.h"
 #include "output.h"

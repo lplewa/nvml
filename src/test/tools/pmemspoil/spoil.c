@@ -1278,6 +1278,16 @@ pmemspoil_process(struct pmemspoil *psp,
 int
 main(int argc, char *argv[])
 {
+#ifdef _WIN32
+	wchar_t **wargv = CommandLineToArgvW(GetCommandLineW(), &argc);
+	for (int i = 0; i < argc; i++) {
+		argv[i] = util_toUTF8(wargv[i]);
+		if (argv[i]) {
+			outv_err("Error during arguments conversion\n");
+			exit(EXIT_FAILURE);
+		}
+	}
+#endif
 	char *appname = basename(argv[0]);
 	util_init();
 	int ret = 0;

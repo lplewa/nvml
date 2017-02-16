@@ -854,7 +854,7 @@ function check_layout {
     $buff = New-Object Byte[] $LAYOUT_LEN
     # you must assign return value otherwise PS will print it to stdout
     $num = $stream.Read($buff, 0, $LAYOUT_LEN)
-    $enc = [System.Text.Encoding]::ASCII.GetString($buff)
+    $enc = [System.Text.Encoding]::UTF8.GetString($buff)
     $stream.Close()
     if ($enc -ne $layout) {
         Write-Error "error: layout doesn't match $enc != $layout"
