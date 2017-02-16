@@ -619,7 +619,7 @@ UNICODE_FUNCTION(pmem_map_file)(const char *path, size_t len, int flags,
 	if (flags & PMEM_FILE_TMPFILE)
 		open_flags |= O_TMPFILE;
 
-	if ((fd = open(path, open_flags, mode)) < 0) {
+	if ((fd = os_open(path, open_flags, mode)) < 0) {
 		ERR("!open %s", path);
 		return NULL;
 	}
@@ -687,7 +687,7 @@ err:
 	oerrno = errno;
 	(void) close(fd);
 	if (delete_on_err)
-		(void) unlink(path);
+		(void) os_unlink(path);
 	errno = oerrno;
 	return NULL;
 }

@@ -40,6 +40,7 @@
 #include <sys/mman.h>
 
 #include "pmem.h"
+#include "os.h"
 #include "out.h"
 
 #define PROCMAXLEN 2048 /* maximum expected line length in /proc files */
@@ -96,7 +97,7 @@ is_pmem_proc_parse(const void **addr, size_t *lenp)
 	LOG(4, "addr %p len %zu", caddr, len);
 
 	FILE *fp;
-	if ((fp = fopen("/proc/self/smaps", "r")) == NULL) {
+	if ((fp = os_fopen("/proc/self/smaps", "r")) == NULL) {
 		ERR("!/proc/self/smaps");
 		return RES_ERROR;
 	}
