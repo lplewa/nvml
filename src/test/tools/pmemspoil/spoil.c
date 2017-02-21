@@ -1282,9 +1282,11 @@ main(int argc, char *argv[])
 	wchar_t **wargv = CommandLineToArgvW(GetCommandLineW(), &argc);
 	for (int i = 0; i < argc; i++) {
 		argv[i] = util_toUTF8(wargv[i]);
-		if (argv[i]) {
+		if (argv[i] == NULL) {
+			for (i--; i >= 0; i--)
+				free(argv[i]);
 			outv_err("Error during arguments conversion\n");
-			exit(EXIT_FAILURE);
+			return 1;
 		}
 	}
 #endif
@@ -1344,6 +1346,9 @@ error:
 	pool_set_file_close(psp->pfile);
 
 	free(psp);
-
+#ifdef _WIN32
+	for (int i = argc; i > 0; i--)
+		free(argv[i - 1]);
+#endif
 	return ret;
 }

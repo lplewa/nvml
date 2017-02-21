@@ -116,7 +116,7 @@ util_aligned_free(void *ptr)
 utf8_t *
 util_toUTF8(const wchar_t *wstr)
 {
-	int size = WideCharToMultiByte(CP_UTF8, 0, wstr, -1,
+	int size = WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, wstr, -1,
 		NULL, 0, NULL, NULL);
 	if (size == 0) {
 		errno = EINVAL;
@@ -129,7 +129,7 @@ util_toUTF8(const wchar_t *wstr)
 		return NULL;
 	}
 
-	if (WideCharToMultiByte(CP_UTF8, 0, wstr, -1, str, size,
+	if (WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, wstr, -1, str, size,
 		NULL, NULL) == 0) {
 		Free(str);
 		errno = EINVAL;
@@ -143,27 +143,27 @@ util_toUTF8(const wchar_t *wstr)
  * util_toUTF16 -- XXX
  */
 utf16_t *
-util_toUTF16(const utf8_t *wstr)
+util_toUTF16(const utf8_t *str)
 {
-	int size = MultiByteToWideChar(CP_UTF8, 0, wstr, -1, NULL, 0);
+	int size = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, str, -1, NULL, 0);
 	if (size == 0) {
 		errno = EINVAL;
 		return NULL;
 	}
 
-	utf16_t *str = Malloc(size * sizeof(utf16_t));
-	if (str == NULL) {
+	utf16_t *wstr = Malloc(size * sizeof(utf16_t));
+	if (wstr == NULL) {
 		errno = ENOMEM;
 		return NULL;
 	}
 
-	if (MultiByteToWideChar(CP_UTF8, 0, wstr, -1, str, size) == 0) {
-		Free(str);
+	if (MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, str, -1, wstr, size) == 0) {
+		Free(wstr);
 		errno = EINVAL;
 		return NULL;
 	}
 
-	return str;
+	return wstr;
 }
 
 /*
@@ -175,11 +175,11 @@ util_toUTF16_inplace(const utf8_t *in, utf16_t *out, size_t out_size)
 	if (out == NULL)
 		goto err;
 
-	int size = MultiByteToWideChar(CP_UTF8, 0, in, -1, NULL, 0);
+	int size = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, in, -1, NULL, 0);
 	if (size == 0 || out_size < size)
 		goto err;
 
-	if (MultiByteToWideChar(CP_UTF8, 0, in, -1, out, size) == 0)
+	if (MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, in, -1, out, size) == 0)
 		goto err;
 
 	return 0;

@@ -1,5 +1,5 @@
-#
-# Copyright 2014-2017, Intel Corporation
+﻿#
+# Copyright 2017, Intel Corporation
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -30,32 +30,16 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# pmempool_info/TEST11 -- test for info command
+# pmempool_dump/config.PS1 -- test configuration
 #
-[CmdletBinding(PositionalBinding=$false)]
-Param(
-    [alias("d")]
-    $DIR = ""
-    )
-$Env:UNITTEST_NAME = "pmempool_info\TEST11"
-$Env:UNITTEST_NUM = "11"
 
+$global:encoding_dict = @{
+    ascii = new-object PSObject | select-object sufixexe, sufix; 
+    utf16 = new-object PSObject | select-object sufixexe, sufix; 
+}
 
-. ..\unittest\unittest.ps1
+$global:encoding_dict.Get_Item("ascii").sufixexe = ".exe"
+$global:encoding_dict.Get_Item("ascii").sufix = ""
 
-require_test_type medium
-
-require_fs_type any
-
-setup
-
-$POOL="$DIR\file.pool"
-$LOG="out$Env:UNITTEST_NUM.log"
-rm $LOG -Force -Recurse -ea si
-
-expect_normal_exit $PMEMPOOL create --layout $Env:SUFIX obj $POOL
-expect_normal_exit $PMEMPOOL info -H $POOL >> $LOG
-
-check
-
-pass
+$global:encoding_dict.Get_Item("utf16").sufixexe = "_win.exe"
+$global:encoding_dict.Get_Item("utf16").sufix = "😘⠝⠧⠍⠇ɗNVMLӜ⥺🙋"

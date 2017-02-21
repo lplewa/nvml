@@ -1108,7 +1108,7 @@ util_part_open(struct pool_set_part *part, size_t minsize, int create)
 	LOG(3, "part %p minsize %zu create %d", part, minsize, create);
 
 	/* check if file exists */
-	if (access(part->path, F_OK) == 0)
+	if (os_access(part->path, F_OK) == 0)
 		create = 0;
 
 	part->created = 0;
