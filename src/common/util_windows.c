@@ -113,7 +113,7 @@ util_aligned_free(void *ptr)
 /*
  * util_toUTF8 -- XXX
  */
-utf8_t *
+char *
 util_toUTF8(const wchar_t *wstr)
 {
 	int size = WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, wstr, -1,
@@ -123,7 +123,7 @@ util_toUTF8(const wchar_t *wstr)
 		return NULL;
 	}
 
-	utf8_t *str = Malloc(size * sizeof(utf8_t));
+	char *str = Malloc(size * sizeof(char));
 	if (str == NULL) {
 		errno = ENOMEM;
 		return NULL;
@@ -142,8 +142,8 @@ util_toUTF8(const wchar_t *wstr)
 /*
  * util_toUTF16 -- XXX
  */
-utf16_t *
-util_toUTF16(const utf8_t *str)
+wchar_t *
+util_toUTF16(const char *str)
 {
 	int size = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, str, -1, NULL, 0);
 	if (size == 0) {
@@ -151,7 +151,7 @@ util_toUTF16(const utf8_t *str)
 		return NULL;
 	}
 
-	utf16_t *wstr = Malloc(size * sizeof(utf16_t));
+	wchar_t *wstr = Malloc(size * sizeof(wchar_t));
 	if (wstr == NULL) {
 		errno = ENOMEM;
 		return NULL;
@@ -170,7 +170,7 @@ util_toUTF16(const utf8_t *str)
  * util_toUTF16 -- XXX user responsible for supplying a large enough out buffer.
  */
 int
-util_toUTF16_inplace(const utf8_t *in, utf16_t *out, size_t out_size)
+util_toUTF16_buff(const char *in, wchar_t *out, size_t out_size)
 {
 	if (out == NULL)
 		goto err;
@@ -180,6 +180,30 @@ util_toUTF16_inplace(const utf8_t *in, utf16_t *out, size_t out_size)
 		goto err;
 
 	if (MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, in, -1, out, size) == 0)
+		goto err;
+
+	return 0;
+err:
+	errno = EINVAL;
+	return -1;
+}
+
+/*
+* util_toUTF8_buff -- XXX user responsible for supplying a large enough out buffer.
+*/
+int
+util_toUTF8_buff(const wchar_t *in, char *out, size_t out_size)
+{
+	if (out == NULL)
+		goto err;
+
+	int size = WideCharToMultiByte(CP_UTF8, 0, in, -1,
+		NULL, 0, NULL, NULL);
+	if (size == 0 || out_size < size)
+		goto err;
+
+	if (WideCharToMultiByte(CP_UTF8, 0, in, -1, out, size,
+		NULL, NULL) == 0)
 		goto err;
 
 	return 0;

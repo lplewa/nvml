@@ -11,7 +11,7 @@ REPLICA
 20M $(nW)part10
 20M $(nW)part11
 
-$(nW)TEST1w: START: libpmempool_transform
+$(nW)TEST1w: START: libpmempool_transform$(nW)
 
 Poolset structure:
 Number of replicas       : 2
@@ -44,5 +44,3 @@ Number of lanes          : 1024
 Heap offset              : $(nW)
 Heap size                : $(nW)
 Root offset              : 0x0
-
-

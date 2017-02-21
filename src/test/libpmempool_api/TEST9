@@ -62,8 +62,8 @@ do
 	check_file $POOL
 
 	cp $POOL ${POOL}_copy >> $LOG_TEMP
-	expect_normal_exit ./libpmempool_test$EXESUFFIX $POOL\
-		-d 1 -r 1 -y 1 -t ${field} >> $LOG
+	expect_normal_exit ./libpmempool_test$EXESUFFIX\
+		-d 1 -r 1 -y 1 -t ${field} $POOL >> $LOG
 	cat $LOG >> $LOG_TEMP
 	cmp $POOL ${POOL}_copy >> $LOG_TEMP || true
 

@@ -97,26 +97,26 @@ srpr 20M 9
 
 # Create a pool
 expect_normal_exit $PMEMPOOL create --layout=$LAYOUT obj $POOLSET_IN
-cat $LOG >> $LOG_TEMP
+cat -Encoding Ascii $LOG | Out-File -append -encoding ascii $LOG_TEMP
 
 # Write some data into the pool, hitting two part files
-expect_normal_exit $PMEMOBJCLI -s $WRITE_SCRIPT $POOLSET_IN >> $LOG_TEMP
+expect_normal_exit $PMEMOBJCLI -s $WRITE_SCRIPT $POOLSET_IN | Out-File -append -encoding ascii $LOG_TEMP
 
 # Check if correctly written
-expect_normal_exit $PMEMOBJCLI -s $READ_SCRIPT $POOLSET_IN >> $LOG_TEMP
+expect_normal_exit $PMEMOBJCLI -s $READ_SCRIPT $POOLSET_IN | Out-File -append -encoding ascii $LOG_TEMP
 
 # Transform poolset
 $FLAGS = "0"
 expect_normal_exit $Env:EXE_DIR\libpmempool_transform$Env:EXESUFFIX `
     $POOLSET_IN $POOLSET_OUT $FLAGS
-cat $LOG >> $LOG_TEMP
+cat -Encoding Ascii $LOG | Out-File -append -encoding ascii $LOG_TEMP
 
 # Check if correctly copied
-expect_normal_exit $PMEMOBJCLI -s $READ_SCRIPT $POOLSET_OUT >> $LOG_TEMP
+expect_normal_exit $PMEMOBJCLI -s $READ_SCRIPT $POOLSET_OUT | Out-File -append -encoding ascii $LOG_TEMP
 
 # Check metadata by pmempool info
 for ($i=0; $i -lt 7; $i++) {
-    dump_pool_info $DIR/testfile$i >> $LOG_TEMP
+    dump_pool_info $DIR/testfile$i | Out-File -append -encoding ascii $LOG_TEMP
 }
 
 mv -Force $LOG_TEMP $LOG

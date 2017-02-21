@@ -866,7 +866,7 @@ ut_checksum(uint8_t *addr, size_t len)
 char *
 ut_toUTF8(const wchar_t *wstr)
 {
-	int size = WideCharToMultiByte(CP_UTF8, 0, wstr, -1,
+	int size = WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, wstr, -1,
 		NULL, 0, NULL, NULL);
 	if (size == 0) {
 		UT_FATAL("!ut_toUTF8");
@@ -877,7 +877,7 @@ ut_toUTF8(const wchar_t *wstr)
 		UT_FATAL("!ut_toUTF8");
 	}
 
-	if (WideCharToMultiByte(CP_UTF8, 0, wstr, -1, str, size,
+	if (WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, wstr, -1, str, size,
 		NULL, NULL) == 0) {
 		UT_FATAL("!ut_toUTF8");
 	}
@@ -891,7 +891,7 @@ ut_toUTF8(const wchar_t *wstr)
 wchar_t *
 ut_toUTF16(const char *wstr)
 {
-	int size = MultiByteToWideChar(CP_UTF8, 0, wstr, -1, NULL, 0);
+	int size = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, wstr, -1, NULL, 0);
 	if (size == 0) {
 		UT_FATAL("!ut_toUTF16");
 	}
@@ -901,7 +901,7 @@ ut_toUTF16(const char *wstr)
 		UT_FATAL("!ut_toUTF16");
 	}
 
-	if (MultiByteToWideChar(CP_UTF8, 0, wstr, -1, str, size) == 0) {
+	if (MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, wstr, -1, str, size) == 0) {
 		UT_FATAL("!ut_toUTF16");
 	}
 
