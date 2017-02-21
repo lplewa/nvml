@@ -1049,6 +1049,9 @@ function setup {
         }
         mkdir $DIR > $null
     }
+    # set console encoding to UTF-8
+
+    [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
     if ($Env:TM -eq "1" ) {
         $script:tm = [system.diagnostics.stopwatch]::startNew()
@@ -1104,23 +1107,25 @@ if (-Not $Env:BUILD) { $Env:BUILD = 'debug'}
 if (-Not $Env:MEMCHECK) { $Env:MEMCHECK = 'auto'}
 if (-Not $Env:CHECK_POOL) { $Env:CHECK_POOL = '0'}
 if (-Not $Env:VERBOSE) { $Env:VERBOSE = '0'}
-$Env:EXESUFFIX = ".exe"
+if (-Not $Env:EXESUFFIX) { $Env:EXESUFFIX = ""}
+if (-Not $Env:SUFFIX) { $Env:SUFFIX = ""}
+if (-Not $Env:EXTRASUFIX) { $Env:EXTRASUFIX = ""}
 
 if ($Env:EXE_DIR -eq $null) {
     $Env:EXE_DIR = "..\..\x64\debug"
 }
 
-$PMEMPOOL="$Env:EXE_DIR\pmempool$Env:EXESUFFIX"
-$PMEMSPOIL="$Env:EXE_DIR\pmemspoil$Env:EXESUFFIX"
-$PMEMWRITE="$Env:EXE_DIR\pmemwrite$Env:EXESUFFIX"
-$PMEMALLOC="$Env:EXE_DIR\pmemalloc$Env:EXESUFFIX"
-$PMEMDETECT="$Env:EXE_DIR\pmemdetect$Env:EXESUFFIX"
-$PMEMOBJCLI="$Env:EXE_DIR\pmemobjcli$Env:EXESUFFIX"
-$DDMAP="$Env:EXE_DIR\ddmap$Env:EXESUFFIX"
-$BTTCREATE="$Env:EXE_DIR\bttcreate$Env:EXESUFFIX"
+$PMEMPOOL="$Env:EXE_DIR\pmempool.exe"
+$PMEMSPOIL="$Env:EXE_DIR\pmemspoil.exe"
+$PMEMWRITE="$Env:EXE_DIR\pmemwrite.exe"
+$PMEMALLOC="$Env:EXE_DIR\pmemalloc.exe"
+$PMEMDETECT="$Env:EXE_DIR\pmemdetect.exe"
+$PMEMOBJCLI="$Env:EXE_DIR\pmemobjcli.exe"
+$DDMAP="$Env:EXE_DIR\ddmap.exe"
+$BTTCREATE="$Env:EXE_DIR\bttcreate.exe"
 
-$SPARSEFILE="$Env:EXE_DIR\sparsefile$Env:EXESUFFIX"
-$DLLVIEW="$Env:EXE_DIR\dllview$Env:EXESUFFIX"
+$SPARSEFILE="$Env:EXE_DIR\sparsefile.exe"
+$DLLVIEW="$Env:EXE_DIR\dllview.exe"
 
 #
 # For non-static build testing, the variable TEST_LD_LIBRARY_PATH is
@@ -1138,13 +1143,6 @@ if (-Not $Env:TEST_TYPE_LD_LIBRARY_PATH) {
         'nondebug' { $Env:TEST_TYPE_LD_LIBRARY_PATH = '..\..\nondebug' }
     }
 }
-
-#
-# When running static binary tests, append the build type to the binary
-#
-#switch -wildcard ($Env:BUILD) {
-#    'static-*' {$Env:EXESUFFIX = '.' + $Env:BUILD}
-#}
 
 #
 # The variable DIR is constructed so the test uses that directory when
@@ -1180,7 +1178,7 @@ if ($DIR) {
     # if user passed it in...
     sv -Name "DIR" ($DIR + "\" + $curtestdir + $Env:UNITTEST_NUM)
 } else {
-    $tail = "\" + $curtestdir + $Env:UNITTEST_NUM
+    $tail = "\" + $curtestdir + $Env:UNITTEST_NUM + $Env:SUFFIX
     # choose based on FS env variable
     switch ($Env:FS) {
         'pmem' { sv -Name DIR ($Env:PMEM_FS_DIR + $tail)
