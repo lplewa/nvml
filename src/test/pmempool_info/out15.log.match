@@ -24,7 +24,7 @@ Checksum                 : $(*) [OK]
 
 PMEM OBJ Header:
 $(OPT)Layout                   : pmempool
-$(OPT)Layout                   : 😘⠝⠧⠍⠇ɗNVMLӜ⥺🙋
+$(OPT)Layout                   : pmempool😘⠝⠧⠍⠇ɗNVMLӜ⥺🙋
 Lanes offset             : $(*)
 Number of lanes          : $(*)
 Heap offset              : $(*)
@@ -60,7 +60,7 @@ Checksum                 : $(*) [OK]
 
 PMEM OBJ Header:
 $(OPT)Layout                   : pmempool
-$(OPT)Layout                   : 😘⠝⠧⠍⠇ɗNVMLӜ⥺🙋
+$(OPT)Layout                   : pmempool😘⠝⠧⠍⠇ɗNVMLӜ⥺🙋
 Lanes offset             : $(*)
 Number of lanes          : $(*)
 Heap offset              : $(*)

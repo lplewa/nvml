@@ -66,7 +66,7 @@ create_poolset $POOLSET 32M:${POOL1}:z 32M:${POOL2}:z `
 check_file $POOLSET
 
 remove_files $POOLS $REPS
-expect_normal_exit $PMEMPOOL create obj --layout $Env:SUFFIX $POOLSET
+expect_normal_exit $PMEMPOOL create obj --layout pmempool$Env:SUFFIX $POOLSET
 expect_normal_exit $PMEMPOOL info $POOL1 >> $LOG
 expect_normal_exit $PMEMPOOL info $POOL1 >> $LOG
 expect_normal_exit $PMEMPOOL info $REPL1 >> $LOG

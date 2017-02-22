@@ -84,13 +84,13 @@ check_signatures PMEMLOG $POOL1 $POOL2 $POOL3
 
 # PMEMOBJ
 remove_files $POOLS
-expect_normal_exit $PMEMPOOL create --layout=$Env:SUFFIX obj $POOLSET
+expect_normal_exit $PMEMPOOL create --layout=pmempool$Env:SUFFIX obj $POOLSET
 check_files $POOL1 $POOL2 $POOL3
 check_signatures PMEMOBJ $POOL1 $POOL2 $POOL3
 
 # PMEMOBJ with replica
 remove_files $POOLS
-expect_normal_exit $PMEMPOOL create --layout=$Env:SUFFIX obj $POOLREP
+expect_normal_exit $PMEMPOOL create --layout=pmempool$Env:SUFFIX obj $POOLREP
 check_files $POOL1 $POOL2 $POOL3 $REPL1 $REPL2 $REPL3
 check_signatures PMEMOBJ $POOL1 $POOL2 $POOL3 $REPL1 $REPL2 $REPL3
 

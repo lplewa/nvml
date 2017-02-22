@@ -39,7 +39,7 @@ $global:encoding_dict = @{
 }
 
 $global:encoding_dict.Get_Item("ascii").sufixexe = ".exe"
-$global:encoding_dict.Get_Item("ascii").sufix = "pmempool"
+$global:encoding_dict.Get_Item("ascii").sufix = ""
 
 $global:encoding_dict.Get_Item("utf16").sufixexe = "_win.exe"
 $global:encoding_dict.Get_Item("utf16").sufix = "😘⠝⠧⠍⠇ɗNVMLӜ⥺🙋"
