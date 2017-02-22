@@ -264,7 +264,7 @@ function runtest {
                     }
                 
                     $Env:ENCODING = $enc
-                    $Env:SUFFIX = $encoding_dict.Item($enc).sufixdir
+                    $Env:SUFFIX = $encoding_dict.Item($enc).sufix
                     $Env:EXESUFFIX = $encoding_dict.Item($enc).sufixexe
                     $Env:CHECK_TYPE = $checktype
                     $Env:CHECK_POOL = $check_pool
