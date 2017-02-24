@@ -503,7 +503,7 @@ util_replica_close_local(struct pool_replica *rep, int del)
 			(void) close(rep->part[p].fd);
 		if (del && rep->part[p].created) {
 			LOG(4, "unlink %s", rep->part[p].path);
-			unlink(rep->part[p].path);
+			os_unlink(rep->part[p].path);
 		}
 	}
 }

@@ -1,5 +1,5 @@
-#
-# Copyright 2015-2017, Intel Corporation
+﻿#
+# Copyright 2017, Intel Corporation
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -29,36 +29,17 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-# src/test/blk_pool_win/TEST9 -- unit test for pmemblk_create
 #
+# blk_pool/config.PS1 -- test configuration
 #
-# parameter handling
-#
-[CmdletBinding(PositionalBinding=$false)]
-Param(
-    [alias("d")]
-    $DIR = ""
-    )
 
-$Env:UNITTEST_NAME = "blk_pool_win\TEST9"
-$Env:UNITTEST_NUM = "9"
+$global:encoding_dict = @{
+    ascii = new-object PSObject | select-object sufixexe, sufix; 
+    utf16 = new-object PSObject | select-object sufixexe, sufix; 
+}
 
+$global:encoding_dict.Get_Item("ascii").sufixexe = ".exe"
+$global:encoding_dict.Get_Item("ascii").sufix = ""
 
-# standard unit test setup
-. ..\unittest\unittest.ps1
-
-require_test_type medium
-
-setup
-
-#
-# TEST9 non-existing file, poolsize < min required size
-#
-expect_normal_exit $Env:EXE_DIR\blk_pool_win$Env:EXESUFFIX `
-    c $DIR\testfile 4096 1 0640
-
-check_no_files $DIR\testfile
-
-check
-
-pass
+$global:encoding_dict.Get_Item("utf16").sufixexe = "_win.exe"
+$global:encoding_dict.Get_Item("utf16").sufix = "😘⠝⠧⠍⠇ɗNVMLӜ⥺🙋"

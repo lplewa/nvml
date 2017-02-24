@@ -42,8 +42,8 @@ EXPORTS
 	pmemobj_errormsgU
 	pmemobj_errormsgW
 	pmemobj_createU
-	pmemobj_openU
 	pmemobj_createW
+	pmemobj_openU
 	pmemobj_openW
 	pmemobj_close
 	pmemobj_checkU

@@ -1,6 +1,5 @@
-#
-# Copyright 2015-2017, Intel Corporation
-# Copyright (c) 2016, Microsoft Corporation. All rights reserved.
+﻿#
+# Copyright 2017, Intel Corporation
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -30,42 +29,17 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-
 #
-# src/test/obj_pool_win/TEST6 -- unit test for pmemobj_create
+# blk_pool/config.PS1 -- test configuration
 #
-[CmdletBinding(PositionalBinding=$false)]
-Param(
-    [alias("d")]
-    $DIR = ""
-    )
 
-$Env:UNITTEST_NAME = "obj_pool_win\TEST6"
-$Env:UNITTEST_NUM = "6"
+$global:encoding_dict = @{
+    ascii = new-object PSObject | select-object sufixexe, sufix; 
+    utf16 = new-object PSObject | select-object sufixexe, sufix; 
+}
 
+$global:encoding_dict.Get_Item("ascii").sufixexe = ".exe"
+$global:encoding_dict.Get_Item("ascii").sufix = ""
 
-# standard unit test setup
-. ..\unittest\unittest.ps1
-
-require_test_type medium
-
-setup
-
-echo $null >> $DIR\testfile
-
-#
-# TEST6 existing file, file length < min required size, poolsize == 0,
-#       layout string is too long
-
-# /dev/urandom is not implemented yet in windows
-# $ENV:LAYOUT = "dd if=/dev/urandom bs=1 count=768 2>/dev/null | base64 -w 0"
-$LAYOUT = "x" * 1025
-
-expect_normal_exit $Env:EXE_DIR\obj_pool_win$Env:EXESUFFIX `
-    c $DIR\testfile $LAYOUT 0 0640
-
-check_files $DIR\testfile
-
-check
-
-pass
+$global:encoding_dict.Get_Item("utf16").sufixexe = "_win.exe"
+$global:encoding_dict.Get_Item("utf16").sufix = "😘⠝⠧⠍⠇ɗNVMLӜ⥺🙋"

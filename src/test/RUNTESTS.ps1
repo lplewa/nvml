@@ -258,9 +258,12 @@ function runtest {
             }
             # for each build-type being tested...
             Foreach ($build in $builds.split(" ").trim()) {
+                if ($verbose) {
+                    Write-Host "RUNTESTS: Testing build-type: $build..."
+                }
                 Foreach ($enc in $encoding_dict.Keys) {
                     if ($verbose) {
-                        Write-Host "RUNTESTS: Testing build-type: $build..."
+                        Write-Host "RUNTESTS: Testing encoding-type: $enc..."
                     }
                 
                     $Env:ENCODING = $enc
@@ -282,7 +285,7 @@ function runtest {
                     $pinfo.CreateNoWindow = $true
 
                     if ($dryrun -eq "1") {
-                        Write-Host "(in ./$testName) TEST=$testtype FS=$fs BUILD=$build .\$runscript"
+                        Write-Host "(in ./$testName) TEST=$testtype FS=$fs BUILD=$build ENCODING=$enc .\$runscript"
                         break
                     }
                     $pinfo.Arguments = ".\$runscript"
@@ -308,7 +311,7 @@ function runtest {
 
                         if ($stopwatch.elapsed -ge $timeout) {
                             $p | Stop-Process -Force
-                            Write-Error "RUNTESTS: stopping: $testName/$runscript TIMED OUT, TEST=$testtype FS=$fs BUILD=$build"
+                            Write-Error "RUNTESTS: stopping: $testName/$runscript TIMED OUT, TEST=$testtype FS=$fs BUILD=$build ENCODING=$enc"
                             cd ..
                             exit $p.ExitCode
                         }

@@ -1,4 +1,0 @@
-log_pool_win$(nW)TEST29: START: log_pool_win
- $(nW)log_pool_win$(nW) o $(nW)ㅹestㆅile
-$(nW)ㅹestㆅile: pmemlog_open: Success
-log_pool_win$(nW)TEST29: DONE

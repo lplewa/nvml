@@ -1,4 +1,0 @@
-log_pool_win$(nW)TEST12: START: log_pool_win
- $(nW)log_pool_win$(nW) c $(nW)testset 0 0600
-$(nW)testset: pmemlog_create: Operation not supported
-log_pool_win$(nW)TEST12: DONE

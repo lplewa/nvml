@@ -91,7 +91,7 @@ int
 wmain(int argc, wchar_t *argv[])
 {
 	WSTART(argc, argv, "obj_pool_win");
-//	__debugbreak();
+
 	if (argc < 4)
 		UT_FATAL("usage: %s op path layout [poolsize mode]",
 			ut_toUTF8(argv[0]));

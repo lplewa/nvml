@@ -1,4 +1,0 @@
-log_pool_win$(nW)TEST28: START: log_pool_win
- $(nW)log_pool_win$(nW) o $(nW)testset
-$(nW)testset: pmemlog_open: Operation not supported
-log_pool_win$(nW)TEST28: DONE

@@ -36,12 +36,8 @@
 #include "util.h"
 #include "os.h"
 
-/*
- * This in not an empty string: here is UTF-8 bom (EF BB BF)
- * Depends on editor this you are using it can be dispayed as unicode character:
- * Zero Width No-Break Space U+FEFF or <U+FEFF>
- */
-#define UTF8_BOM "﻿"
+/* UTF-8 bom (EF BB BF) */
+#define UTF8_BOM "\xEF\xBB\xBF"
 
 /*
  * os_open -- open abstraction layer

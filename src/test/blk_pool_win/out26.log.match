@@ -1,4 +1,0 @@
-blk_pool_win$(nW)TEST26: START: blk_pool_win
- $(nW)blk_pool_win$(nW) o $(nW)testfile 0
-$(nW)testfile: pmemblk_open: Permission denied
-blk_pool_win$(nW)TEST26: DONE

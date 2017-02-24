@@ -1,4 +1,0 @@
-blk_pool_win$(nW)TEST16: START: blk_pool_win
- $(nW)blk_pool_win$(nW) c $(nW)testset 100 0 0600
-$(nW)testset: pmemblk_create: $(*)
-blk_pool_win$(nW)TEST16: DONE

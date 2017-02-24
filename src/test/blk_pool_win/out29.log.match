@@ -1,4 +1,0 @@
-blk_pool_win$(nW)TEST29: START: blk_pool_win
- $(nW)blk_pool_win$(nW) o $(nW)testset 300
-$(nW)testset: pmemblk_open: Success
-blk_pool_win$(nW)TEST29: DONE

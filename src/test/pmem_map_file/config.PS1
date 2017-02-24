@@ -1,6 +1,5 @@
-#
-# Copyright 2015-2017, Intel Corporation
-# Copyright (c) 2016, Microsoft Corporation. All rights reserved.
+﻿#
+# Copyright 2017, Intel Corporation
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -30,38 +29,17 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-
 #
-# src/test/obj_pool_win/TEST22 -- unit test for pmemobj_open
+# blk_pool/config.PS1 -- test configuration
 #
-[CmdletBinding(PositionalBinding=$false)]
-Param(
-    [alias("d")]
-    $DIR = ""
-    )
 
-$Env:UNITTEST_NAME = "obj_pool_win\TEST22"
-$Env:UNITTEST_NUM = "22"
+$global:encoding_dict = @{
+    ascii = new-object PSObject | select-object sufixexe, sufix; 
+    utf16 = new-object PSObject | select-object sufixexe, sufix; 
+}
 
+$global:encoding_dict.Get_Item("ascii").sufixexe = ".exe"
+$global:encoding_dict.Get_Item("ascii").sufix = ""
 
-# standard unit test setup
-. ..\unittest\unittest.ps1
-
-require_test_type medium
-
-setup
-
-#
-# TEST22 existing file, file size < min required size, layout is NULL
-#        (valid pool header)
-#
-expect_normal_exit $Env:EXE_DIR\obj_pool_win$Env:EXESUFFIX `
-    c $DIR/testfile NULL 20 0640
-truncate -s 1M $DIR\testfile
-
-expect_normal_exit $Env:EXE_DIR\obj_pool_win$Env:EXESUFFIX `
-    o $DIR/testfile NULL
-
-check
-
-pass
+$global:encoding_dict.Get_Item("utf16").sufixexe = "_win.exe"
+$global:encoding_dict.Get_Item("utf16").sufix = "😘⠝⠧⠍⠇ɗNVMLӜ⥺🙋"

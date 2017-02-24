@@ -1,4 +1,0 @@
-﻿blk_pool\TEST32: START: blk_pool
- C:\Users\Administrator\nvml\src\x64\debug\blk_pool_win.exe o \temp\\test_blk_pool_win32/testsetㅓㅹ 300
-\temp\\test_blk_pool_win32/testsetㅓㅹ: pmemblk_open: Operation not supported
-blk_pool\TEST32: Done
