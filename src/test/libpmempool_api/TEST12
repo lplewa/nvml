@@ -65,9 +65,9 @@ spcmd="bttdevice.arena.btt_flog(0).seq=4"
 echo $spcmd >> $LOG_TEMP
 $PMEMSPOIL $POOL $spcmd
 
-expect_normal_exit ./libpmempool_test$EXESUFFIX $POOL -r 1 -t btt >> $LOG
+expect_normal_exit ./libpmempool_test$EXESUFFIX -r 1 -t btt $POOL >> $LOG
 cat $LOG >> $LOG_TEMP
-expect_normal_exit ./libpmempool_test$EXESUFFIX $POOL -r 1 -t btt -a 1 >> $LOG
+expect_normal_exit ./libpmempool_test$EXESUFFIX -r 1 -t btt -a 1 $POOL >> $LOG
 cat $LOG >> $LOG_TEMP
 
 mv $LOG_TEMP $LOG

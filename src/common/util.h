@@ -67,8 +67,10 @@ extern unsigned long long Mmap_align;
 
 #ifdef _WIN32
 #define UNICODE_FUNCTION(A) A##U
+#define UNICODE_STRUCT(A) A##U
 #else
 #define UNICODE_FUNCTION(A) A
+#define UNICODE_STRUCT(A) A
 #endif
 
 /*
@@ -78,9 +80,6 @@ typedef void *(*Malloc_func)(size_t size);
 typedef void (*Free_func)(void *ptr);
 typedef void *(*Realloc_func)(void *ptr, size_t size);
 typedef char *(*Strdup_func)(const char *s);
-
-typedef char utf8_t;
-typedef unsigned short utf16_t;
 
 extern Malloc_func Malloc;
 extern Free_func Free;
@@ -99,9 +98,10 @@ void *util_aligned_malloc(size_t alignment, size_t size);
 void util_aligned_free(void *ptr);
 
 #ifdef _WIN32
-utf8_t *util_toUTF8(const utf16_t *wstr);
-utf16_t *util_toUTF16(const utf8_t *wstr);
-int util_toUTF16_inplace(const utf8_t *in, utf16_t *out, size_t out_size);
+char *util_toUTF8(const wchar_t *wstr);
+wchar_t *util_toUTF16(const char *wstr);
+int util_toUTF16_buff(const char *in, wchar_t *out, size_t out_size);
+int util_toUTF8_buff(const wchar_t *in, char *out, size_t out_size);
 #endif
 
 #define UTIL_MAX_ERR_MSG 128

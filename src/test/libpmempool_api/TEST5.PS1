@@ -54,7 +54,8 @@ expect_normal_exit $PMEMPOOL create log $POOL
 check_file $POOL
 expect_normal_exit $PMEMWRITE $POOL TEST
 
-expect_normal_exit $Env:EXE_DIR\libpmempool_test$Env:EXESUFFIX $POOL -d 1 -b "$POOL.backup"
+expect_normal_exit $Env:EXE_DIR\libpmempool_test$Env:EXESUFFIX `
+		-d 1 -b "$POOL.backup" $POOL
 check
 
 pass

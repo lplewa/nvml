@@ -54,7 +54,8 @@ expect_normal_exit $PMEMPOOL create log $POOL
 check_file $POOL
 expect_normal_exit $PMEMWRITE $POOL TEST
 
-expect_normal_exit $Env:EXE_DIR\libpmempool_test$Env:EXESUFFIX $POOL -r 0 -y 1
+expect_normal_exit $Env:EXE_DIR\libpmempool_test$Env:EXESUFFIX `
+		-r 0 -y 1 $POOL
 
 check
 

@@ -43,9 +43,9 @@
  * os_open -- open abstraction layer
  */
 int
-os_open(const utf8_t *pathname, int flags, ...)
+os_open(const char *pathname, int flags, ...)
 {
-	utf16_t *path = util_toUTF16(pathname);
+	wchar_t *path = util_toUTF16(pathname);
 	int ret = 0;
 	if (path == NULL) {
 		return -1;
@@ -80,7 +80,7 @@ os_open(const utf8_t *pathname, int flags, ...)
 int
 os_stat(const char *pathname, os_stat_t *buf)
 {
-	utf16_t *path = util_toUTF16(pathname);
+	wchar_t *path = util_toUTF16(pathname);
 	if (path == NULL) {
 		return -1;
 	}
@@ -97,7 +97,7 @@ os_stat(const char *pathname, os_stat_t *buf)
 int
 os_unlink(const char *pathname)
 {
-	utf16_t *path = util_toUTF16(pathname);
+	wchar_t *path = util_toUTF16(pathname);
 	if (path == NULL) {
 		return -1;
 	}
@@ -150,12 +150,12 @@ os_skipBOM(FILE *file)
 FILE *
 os_fopen(const char *pathname, const char *mode)
 {
-	utf16_t *path = util_toUTF16(pathname);
+	wchar_t *path = util_toUTF16(pathname);
 	if (path == NULL) {
 		return NULL;
 	}
 
-	utf16_t *wmode = util_toUTF16(mode);
+	wchar_t *wmode = util_toUTF16(mode);
 	if (path == NULL) {
 		Free(path);
 		return NULL;
@@ -187,7 +187,7 @@ os_fdopen(int fd, const char *mode)
 int
 os_chmod(const char *pathname, mode_t mode)
 {
-	utf16_t *path = util_toUTF16(pathname);
+	wchar_t *path = util_toUTF16(pathname);
 	if (path == NULL) {
 		return -1;
 	}

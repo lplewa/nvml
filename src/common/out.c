@@ -136,12 +136,12 @@ Last_errormsg_get()
 }
 
 #ifdef _WIN32
-static inline utf16_t *
+static inline wchar_t *
 Last_errormsgw_get()
 {
 	Last_errormsg_key_alloc();
 
-	utf16_t *errormsg = pthread_getspecific(Last_errormsgw_key);
+	wchar_t *errormsg = pthread_getspecific(Last_errormsgw_key);
 	if (errormsg == NULL) {
 		errormsg = Malloc(MAXPRINTW);
 		int ret = pthread_setspecific(Last_errormsgw_key, errormsg);
@@ -603,8 +603,8 @@ const wchar_t *
 out_get_errormsgW(void)
 {
 	const char *utf8 = Last_errormsg_get();
-	utf16_t *utf16 = Last_errormsgw_get();
-	if (util_toUTF16_inplace(utf8, utf16, MAXPRINTW) != 0)
+	wchar_t *utf16 = Last_errormsgw_get();
+	if (util_toUTF16_buff(utf8, utf16, MAXPRINTW) != 0)
 		FATAL("!Failed to convert string");
 
 	return (const wchar_t *)utf16;

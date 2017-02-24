@@ -121,7 +121,7 @@ function backup_and_compare () {
 
 	# backup
 	expect_normal_exit ../libpmempool_api/libpmempool_test$EXESUFFIX \
-		$poolset -b $poolset$BACKUP -t $type -r 1
+		-b $poolset$BACKUP -t $type -r 1 $poolset
 	cat $OUT >> $OUT_TEMP
 
 	# compare

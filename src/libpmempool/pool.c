@@ -475,7 +475,7 @@ pool_set_parse(struct pool_set **setp, const char *path)
 {
 	LOG(3, "setp %p path %s", setp, path);
 
-	int fd = open(path, O_RDONLY);
+	int fd = os_open(path, O_RDONLY);
 	int ret = 0;
 
 	if (fd < 0)
@@ -662,7 +662,7 @@ pool_copy(struct pool_data *pool, const char *dst_path, int overwrite)
 {
 	struct pool_set_file *file = pool->set_file;
 	int dfd;
-	if (!access(dst_path, F_OK)) {
+	if (!os_access(dst_path, F_OK)) {
 		if (!overwrite) {
 			errno = EEXIST;
 			return -1;
@@ -760,7 +760,7 @@ pool_set_part_copy(struct pool_set_part *dpart, struct pool_set_part *spart,
 	int is_pmem;
 	void *daddr;
 
-	if (!access(dpart->path, F_OK)) {
+	if (!os_access(dpart->path, F_OK)) {
 		if (!overwrite) {
 			errno = EEXIST;
 			result = -1;

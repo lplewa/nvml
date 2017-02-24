@@ -698,7 +698,7 @@ err:
 void *
 pmem_map_fileW(const wchar_t *path, size_t len, int flags, mode_t mode,
 		size_t *mapped_lenp, int *is_pmemp) {
-	utf8_t *_path = util_toUTF8(path);
+	char *_path = util_toUTF8(path);
 	if (_path == NULL)
 		return NULL;
 	void *ret = pmem_map_fileU(_path, len, flags, mode, mapped_lenp,
