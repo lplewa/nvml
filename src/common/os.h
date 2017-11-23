@@ -46,6 +46,7 @@ extern "C" {
 #include <unistd.h>
 
 #include "errno_freebsd.h"
+#include "uuid.h"
 
 #ifndef _WIN32
 #define OS_DIR_SEPARATOR '/'
