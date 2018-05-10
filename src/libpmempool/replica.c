@@ -618,8 +618,12 @@ check_shutdown_state(struct pool_set *set,
 		/* make a copy of sds as we shouldn't modify a pool */
 		struct shutdown_state pool_sds = hdrp->sds;
 
-		if (shutdown_state_check(&curr_sds, &pool_sds, NULL))
+		if (shutdown_state_check(&curr_sds, &pool_sds, NULL)) {
 				rep_hs->flags |= IS_BROKEN;
+				/* XXX: test dirty flag to corrupted */
+				shutdown_state_set_flag(&hdrp->sds,
+					SHUTDOWN_STATE_CORRUPTED, NULL);
+		}
 
 	}
 	return 0;

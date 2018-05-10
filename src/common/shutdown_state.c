@@ -128,28 +128,14 @@ shutdown_state_add_part(struct shutdown_state *sds, const char *path,
  * shutdown_state_set_flag -- sets dirty pool flag
  */
 void
-shutdown_state_set_flag(struct shutdown_state *sds, struct pool_set_part *part)
-{
-	LOG(3, "sds %p", sds);
-
-	/* set dirty flag only if uid is non-zero */
-	if (sds->uuid != 0)
-		sds->dirty = 1;
-
-	FLUSH_SDS(sds, part);
-
-	shutdown_state_checksum(sds, part);
-}
-
-/*
- * pmem_shutdown_clear_flag -- clears dirty pool flag
- */
-void
-shutdown_state_clear_flag(struct shutdown_state *sds,
+shutdown_state_set_flag(struct shutdown_state *sds, uint8_t flag,
 	struct pool_set_part *part)
 {
 	LOG(3, "sds %p", sds);
-	sds->dirty = 0;
+
+	if (sds->uuid != 0 && sds->dirty != SHUTDOWN_STATE_CORRUPTED)
+		sds->dirty = flag;
+
 	FLUSH_SDS(sds, part);
 
 	shutdown_state_checksum(sds, part);
@@ -166,7 +152,7 @@ shutdown_state_reinit(struct shutdown_state *curr_sds,
 	shutdown_state_init(pool_sds, part);
 	pool_sds->uuid = htole64(curr_sds->uuid);
 	pool_sds->usc = htole64(curr_sds->usc);
-	pool_sds->dirty = 0;
+	pool_sds->dirty = SHUTDOWN_STATE_CLEAN;
 
 	FLUSH_SDS(pool_sds, part);
 
@@ -205,7 +191,7 @@ shutdown_state_check(struct shutdown_state *curr_sds,
 	}
 
 	if (is_uuid_usc_correct) {
-		if (dirty == 0)
+		if (dirty == SHUTDOWN_STATE_CLEAN)
 			return 0;
 		/*
 		 * the program was killed when the pool was opened
@@ -216,13 +202,16 @@ shutdown_state_check(struct shutdown_state *curr_sds,
 		shutdown_state_reinit(curr_sds, pool_sds, part);
 		return 0;
 	}
-	if (dirty == 0) {
+	if (dirty == SHUTDOWN_STATE_CLEAN) {
 		/* an ADR failure but the pool was closed */
 		LOG(2,
 			"an ADR failure was detected but the pool was closed - SDS will be reinitialized");
 		shutdown_state_reinit(curr_sds, pool_sds, part);
 		return 0;
 	}
+
+	shutdown_state_set_flag(pool_sds, SHUTDOWN_STATE_CORRUPTED, part);
+
 	/* an ADR failure - the pool might be corrupted */
 	ERR("an ADR failure was detected, the pool might be corrupted");
 	return 1;

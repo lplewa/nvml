@@ -123,13 +123,13 @@ main(int argc, char *argv[])
 		}
 	}
 	FAIL(fail_on, 4);
-	shutdown_state_set_flag(pool_sds, NULL);
+	shutdown_state_set_flag(pool_sds, SHUTDOWN_STATE_DIRTY, NULL);
 
 	/* pool is open */
 	FAIL(fail_on, 5);
 
 	/* close pool */
-	shutdown_state_clear_flag(pool_sds, NULL);
+	shutdown_state_set_flag(pool_sds, SHUTDOWN_STATE_CLEAN, NULL);
 	FAIL(fail_on, 6);
 
 	for (int i = 0; i < files; i++)

@@ -39,6 +39,11 @@
 
 #include <stdint.h>
 
+/* dirty flag values */
+#define SHUTDOWN_STATE_CLEAN 0
+#define SHUTDOWN_STATE_DIRTY 1
+#define SHUTDOWN_STATE_CORRUPTED 2
+
 struct pool_set_part;
 struct shutdown_state {
 	uint64_t usc;
@@ -51,9 +56,7 @@ struct shutdown_state {
 int shutdown_state_init(struct shutdown_state *sds, struct pool_set_part *part);
 int shutdown_state_add_part(struct shutdown_state *sds, const char *path,
 	struct pool_set_part *part);
-void shutdown_state_set_flag(struct shutdown_state *sds,
-	struct pool_set_part *part);
-void shutdown_state_clear_flag(struct shutdown_state *sds,
+void shutdown_state_set_flag(struct shutdown_state *sds, uint8_t flag,
 	struct pool_set_part *part);
 
 int shutdown_state_check(struct shutdown_state *curr_sds,
