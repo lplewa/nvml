@@ -317,28 +317,28 @@ in the example file (src/test/testconfig.ps1.example).
 To run the unit tests, open the PowerShell console and type:
 ```
 	> cd pmdk/src/test
-	> RUNTESTS.ps1
+	> RUNTESTS.PS1
 ```
 
 To run a specific subset of tests, run for example:
 ```
-	> RUNTESTS.ps1 -b debug -t short
+	> RUNTESTS.PS1 -b debug -t short
 ```
 
 To run just one test, run for example:
 ```
-	> RUNTESTS.ps1 -b debug -i pmem_is_pmem
+	> RUNTESTS.PS1 -b debug -i pmem_is_pmem
 ```
 
 To modify the timeout, run:
 ```
-	> RUNTESTS.ps1 -o 3m
+	> RUNTESTS.PS1 -o 3m
 ```
 This will set the timeout to 3 minutes.
 
 To display all the possible options, run:
 ```
-	> RUNTESTS.ps1 -h
+	> RUNTESTS.PS1 -h
 ```
 
 Please refer to the **src/test/README** for more details on how to
