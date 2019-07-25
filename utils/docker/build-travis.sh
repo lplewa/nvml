@@ -68,7 +68,7 @@ if [[ -z "$HOST_WORKDIR" ]]; then
 fi
 
 if [[ -z "$TEST_BUILD" ]]; then
-	TEST_BUILD=all
+	TEST_BUILD="debug nondebug"
 fi
 
 imageName=${DOCKERHUB_REPO}:1.7-${OS}-${OS_VER}

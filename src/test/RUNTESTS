@@ -34,7 +34,7 @@
 #
 # RUNTESTS -- setup the environment and run each test
 #
-
+set -x
 #
 # usage -- print usage message and exit
 #
