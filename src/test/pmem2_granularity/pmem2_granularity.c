@@ -39,6 +39,7 @@
 #include <string.h>
 
 #include "config.h"
+#include "map.h"
 #include "pmem2_granularity.h"
 #include "unittest.h"
 #include "ut_pmem2_config.h"
@@ -322,7 +323,9 @@ static struct test_case test_cases[] = {
 int
 main(int argc, char *argv[])
 {
+	pmem2_map_init();
 	START(argc, argv, "pmem2_granularity");
 	TEST_CASE_PROCESS(argc, argv, test_cases, NTESTS);
+	pmem2_map_fini();
 	DONE(NULL);
 }
