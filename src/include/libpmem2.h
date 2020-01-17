@@ -80,6 +80,7 @@ extern "C" {
 #define PMEM2_E_INVALID_SIZE_FORMAT		(-100014)
 #define PMEM2_E_LENGTH_UNALIGNED		(-100015)
 #define PMEM2_E_MAPPING_NOT_FOUND		(-100016)
+#define PMEM2_E_EXTERNAL			(-200000)
 
 /* config setup */
 

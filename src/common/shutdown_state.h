@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018, Intel Corporation
+ * Copyright 2017-2020, Intel Corporation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -53,7 +53,7 @@ struct shutdown_state {
 };
 
 int shutdown_state_init(struct shutdown_state *sds, struct pool_replica *rep);
-int shutdown_state_add_part(struct shutdown_state *sds, const char *path,
+int shutdown_state_add_part(struct shutdown_state *sds, int fd,
 	struct pool_replica *rep);
 void shutdown_state_set_dirty(struct shutdown_state *sds,
 	struct pool_replica *rep);

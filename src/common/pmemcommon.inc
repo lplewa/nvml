@@ -61,7 +61,8 @@ SOURCE =\
 	$(call osdep, $(COMMON)/uuid,.c)\
 	$(PMEM2)/pmem2_utils.c\
 	$(PMEM2)/config.c\
-	$(PMEM2)/config_posix.c
+	$(PMEM2)/config_posix.c\
+	$(PMEM2)/ras_ndctl.c
 
 ifeq ($(OS_KERNEL_NAME),Linux)
 SOURCE +=\

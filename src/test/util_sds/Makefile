@@ -1,5 +1,5 @@
 #
-# Copyright 2015-2018, Intel Corporation
+# Copyright 2015-2020, Intel Corporation
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -33,11 +33,21 @@
 #
 # src/test/util_sds/Makefile -- shutdown_tests unit test
 #
+TOP = ../../..
+vpath %.c $(TOP)/src/test/unittest
+vpath %.c $(TOP)/src/libpmem2/
+
 TARGET = util_sds
-OBJS = util_sds.o
+OBJS = util_sds.o\
+	ut_pmem2_config.o\
+	ut_pmem2_utils.o\
+	map_posix.o\
+	map.o\
+	errormsg.o\
 
 LIBPMEMCOMMON=internal-debug
 LIBPMEM=y
+#LIBPMEM2=y
 
 include ../Makefile.inc
 LDFLAGS += $(call extract_funcs, util_sds.c)

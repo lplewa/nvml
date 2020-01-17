@@ -1,5 +1,5 @@
 /*
- * Copyright 2018, Intel Corporation
+ * Copyright 2018-2020, Intel Corporation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -100,7 +100,7 @@ sds_check_replica(location *loc)
 	/* get current shutdown state */
 	for (unsigned p = 0; p < rep->nparts; ++p) {
 		if (shutdown_state_add_part(&curr_sds,
-				PART(rep, p)->path, NULL))
+				PART(rep, p)->fd, NULL))
 			return -1;
 	}
 

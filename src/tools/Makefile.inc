@@ -1,4 +1,4 @@
-# Copyright 2014-2019, Intel Corporation
+# Copyright 2014-2020, Intel Corporation
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -195,6 +195,8 @@ ifeq ($(LIBPMEM2),y)
 DYNAMIC_LIBS += -lpmem2
 STATIC_DEBUG_LIBS += $(LIBSDIR_DEBUG)/libpmem2.a
 STATIC_NONDEBUG_LIBS += $(LIBSDIR_NONDEBUG)/libpmem2.a
+CFLAGS += $(LIBNDCTL_CFLAGS)
+LIBS += $(LIBNDCTL_LIBS)
 endif
 
 # If any of these libraries is required, we need to link libpthread

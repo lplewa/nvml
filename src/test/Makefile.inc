@@ -220,7 +220,8 @@ OBJS +=\
 	$(call osdep, $(TOP)/src/nondebug/common/uuid,.o)
 	$(TOP)/src/nondebug/libpmem2/pmem2_utils.o\
 	$(TOP)/src/nondebug/libpmem2/config.o\
-	$(TOP)/src/nondebug/libpmem2/config_posix.o
+	$(TOP)/src/nondebug/libpmem2/config_posix.o\
+	$(TOP)/src/nondebug/libpmem2/ras_ndctl.o
 
 ifeq ($(OS_KERNEL_NAME),Linux)
 OBJS += $(TOP)/src/nondebug/libpmem2/pmem2_utils_linux.o\
@@ -263,7 +264,8 @@ OBJS +=\
 	$(call osdep, $(TOP)/src/debug/common/uuid,.o)\
 	$(TOP)/src/debug/libpmem2/pmem2_utils.o\
 	$(TOP)/src/debug/libpmem2/config.o\
-	$(TOP)/src/debug/libpmem2/config_posix.o
+	$(TOP)/src/debug/libpmem2/config_posix.o\
+	$(TOP)/src/debug/libpmem2/ras_ndctl.o
 
 ifeq ($(OS_KERNEL_NAME),Linux)
 OBJS += $(TOP)/src/debug/libpmem2/pmem2_utils_linux.o\
@@ -289,6 +291,7 @@ OBJS +=\
 	$(TOP)/src/debug/libpmem2/persist_posix.o\
 	$(TOP)/src/debug/libpmem2/pmem2.o\
 	$(TOP)/src/debug/libpmem2/pmem2_utils.o\
+	$(TOP)/src/debug/libpmem2/ras_ndctl.o\
 	$(TOP)/src/debug/libpmem2/ravl.o\
 	$(TOP)/src/debug/common/alloc.o\
 	$(TOP)/src/debug/common/fs_posix.o\
@@ -330,6 +333,7 @@ OBJS +=\
 	$(TOP)/src/nondebug/libpmem2/persist_posix.o\
 	$(TOP)/src/nondebug/libpmem2/pmem2.o\
 	$(TOP)/src/nondebug/libpmem2/pmem2_utils.o\
+	$(TOP)/src/nondebug/libpmem2/ras_ndctl.o\
 	$(TOP)/src/nondebug/libpmem2/ravl.o\
 	$(TOP)/src/nondebug/common/alloc.o\
 	$(TOP)/src/nondebug/common/fs_posix.o\
@@ -384,7 +388,7 @@ ifneq ($(LIBPMEMCOMMON)$(LIBPMEMPOOL)$(LIBPMEMOBJ),)
 LIBS += $(LIBDL)
 endif
 
-ifneq ($(LIBPMEMCOMMON)$(LIBPMEMPOOL)$(LIBPMEMBLK)$(LIBPMEMLOG)$(LIBPMEMOBJ),)
+ifneq ($(LIBPMEM2)$(LIBPMEMCOMMON)$(LIBPMEMPOOL)$(LIBPMEMBLK)$(LIBPMEMLOG)$(LIBPMEMOBJ),)
 CFLAGS += $(LIBNDCTL_CFLAGS)
 LIBS += $(LIBNDCTL_LIBS)
 endif
@@ -420,7 +424,7 @@ CXXFLAGS += -ggdb
 CXXFLAGS += $(COMMON_FLAGS)
 CXXFLAGS += $(EXTRA_CXXFLAGS)
 
-CFLAGS  = -std=gnu99
+CFLAGS = -std=gnu99
 CFLAGS += -Wmissing-prototypes
 CFLAGS += $(COMMON_FLAGS)
 
