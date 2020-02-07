@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Copyright 2016-2019, Intel Corporation
+# Copyright 2016-2020, Intel Corporation
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -47,7 +47,7 @@ make -j$(nproc) cstyle
 make -j$(nproc)
 make -j$(nproc) test
 # do not change -j2 to -j$(nproc) in case of tests (make check/pycheck)
-make -j2 pcheck TEST_BUILD=$TEST_BUILD
+# make -j2 pcheck TEST_BUILD=$TEST_BUILD
 # do not change -j2 to -j$(nproc) in case of tests (make check/pycheck)
 make -j2 pycheck
 make -j$(nproc) DESTDIR=/tmp source

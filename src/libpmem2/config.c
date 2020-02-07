@@ -53,6 +53,8 @@ pmem2_config_init(struct pmem2_config *cfg)
 #else
 	cfg->fd = INVALID_FD;
 #endif
+	cfg->addr = NULL;
+	cfg->flags = PMEM2_ADDRESS_ANY;
 	cfg->offset = 0;
 	cfg->length = 0;
 	cfg->alignment = 0;
@@ -174,6 +176,32 @@ pmem2_config_validate_length(const struct pmem2_config *cfg,
 	if (end > aligned_file_len) {
 		ERR("mapping larger than file size");
 		return PMEM2_E_MAP_RANGE;
+	}
+
+	return 0;
+}
+
+/*
+ * pmem2_config_validate_addr_alignment -- validate that addr in the
+ * pmem2_config structure is a multiple of the alignment required for
+ * specific *config
+ */
+int
+pmem2_config_validate_addr_alignment(const struct pmem2_config *cfg)
+{
+	/* cannot NULL % alignment, NULL is valid */
+	if (!cfg->addr)
+		return 0;
+
+	size_t alignment;
+	int ret = pmem2_config_get_alignment(cfg, &alignment);
+	if (ret)
+		return ret;
+
+	ASSERTne(alignment, 0);
+	if ((size_t)cfg->addr % alignment) {
+		ERR("address is not a multiple of %lu", alignment);
+		return PMEM2_E_ADDRESS_UNALIGNED;
 	}
 
 	return 0;

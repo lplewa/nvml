@@ -214,3 +214,27 @@ class TEST25(PMEM2_MAP):
     """map a file which size is not aligned"""
     test_case = "test_map_larger_than_unaligned_file_size"
     filesize = 16 * t.MiB - 1
+
+
+@t.windows_exclude
+class TEST26(PMEM2_MAP):
+    """map a file to the desired addr with flag MAP_FIXED_NOREPLACE"""
+    test_case = "test_map_fixed_noreplace_valid"
+
+
+@t.windows_exclude
+class TEST27(PMEM2_MAP):
+    """
+    map a file and overlap whole other existing mapping with the flag
+    MAP_FIXED_NOREPLACE
+    """
+    test_case = "test_map_fixed_noreplace_full_overlap"
+
+
+@t.windows_exclude
+class TEST28(PMEM2_MAP):
+    """
+    map a file in a middle of other existing mapping with the flag
+    MAP_FIXED_NOREPLACE
+    """
+    test_case = "test_map_fixed_noreplace_partial_overlap"

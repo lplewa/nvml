@@ -48,6 +48,8 @@ struct pmem2_config {
 #else
 	int fd;
 #endif
+	void *addr; /* address of the mapping */
+	int flags; /* flags for the mapping */
 	/* offset from the beginning of the file */
 	size_t offset;
 	size_t length; /* length of the mapping */
@@ -60,5 +62,7 @@ void pmem2_config_init(struct pmem2_config *cfg);
 
 int pmem2_config_validate_length(const struct pmem2_config *cfg,
 		size_t file_len);
+
+int pmem2_config_validate_addr_alignment(const struct pmem2_config *cfg);
 
 #endif /* PMEM2_CONFIG_H */

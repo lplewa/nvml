@@ -1,5 +1,5 @@
 /*
- * Copyright 2019, Intel Corporation
+ * Copyright 2019-2020, Intel Corporation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -50,12 +50,6 @@ pmem2_config_set_protection(struct pmem2_config *cfg, unsigned flag)
 
 int
 pmem2_config_use_anonymous_mapping(struct pmem2_config *cfg, unsigned on)
-{
-	return PMEM2_E_NOSUPP;
-}
-
-int
-pmem2_config_set_address(struct pmem2_config *cfg, unsigned type, void *addr)
 {
 	return PMEM2_E_NOSUPP;
 }

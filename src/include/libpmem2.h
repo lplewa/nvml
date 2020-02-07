@@ -46,6 +46,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#ifndef _WIN32
+#include <sys/mman.h>
+#endif
+
 #ifdef _WIN32
 #include <pmemcompat.h>
 
@@ -80,6 +84,8 @@ extern "C" {
 #define PMEM2_E_INVALID_SIZE_FORMAT		(-100014)
 #define PMEM2_E_LENGTH_UNALIGNED		(-100015)
 #define PMEM2_E_MAPPING_NOT_FOUND		(-100016)
+#define PMEM2_E_INVALID_MMAP_FLAG		(-100017)
+#define PMEM2_E_ADDRESS_UNALIGNED		(-100018)
 
 /* config setup */
 
@@ -114,11 +120,14 @@ int pmem2_config_set_protection(struct pmem2_config *cfg, unsigned flag);
 int pmem2_config_use_anonymous_mapping(struct pmem2_config *cfg, unsigned on);
 
 #define PMEM2_ADDRESS_ANY		0 /* default */
-#define PMEM2_ADDRESS_FIXED_REPLACE	1
-#define PMEM2_ADDRESS_FIXED_NOREPLACE	2
+#define PMEM2_ADDRESS_FIXED_REPLACE	0 /* MAP_FIXED not supported */
+#define PMEM2_ADDRESS_FIXED_NOREPLACE	MAP_FIXED_NOREPLACE
 
-int pmem2_config_set_address(struct pmem2_config *cfg, unsigned type,
-	void *addr);
+#define PMEM2_E_MAP_VALID_FLAGS (PMEM2_ADDRESS_ANY | \
+		PMEM2_ADDRESS_FIXED_REPLACE | \
+		PMEM2_ADDRESS_FIXED_NOREPLACE)
+
+int pmem2_config_set_address(struct pmem2_config *cfg, void *addr, int type);
 
 enum pmem2_granularity {
 	PMEM2_GRANULARITY_BYTE,

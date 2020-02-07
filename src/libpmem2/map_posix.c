@@ -37,7 +37,6 @@
 #include <errno.h>
 #include <stdbool.h>
 #include <string.h>
-#include <sys/mman.h>
 
 #include "libpmem2.h"
 
@@ -135,11 +134,16 @@ get_map_alignment(size_t len, size_t req_align)
  * 1GB alignment, it results in 1024 possible locations.
  */
 static int
-map_reserve(size_t len, size_t alignment, void **reserv, size_t *reslen)
+map_reserve(size_t len, size_t alignment, void **reserv, size_t *reslen,
+		void *mmap_addr, int mmap_flags)
 {
 	ASSERTne(reserv, NULL);
 
 	size_t dlength = len + alignment; /* dummy length */
+
+	/* if MAP_FIXED_NOREPLACE is used dlength == len */
+	if (mmap_addr)
+		dlength = len;
 
 	/*
 	 * Create dummy mapping to find an unused region of given size.
@@ -148,9 +152,13 @@ map_reserve(size_t len, size_t alignment, void **reserv, size_t *reslen)
 	 * zero cost for overcommit accounting.  Note: MAP_NORESERVE
 	 * flag is ignored if overcommit is disabled (mode 2).
 	 */
-	char *daddr = mmap(NULL, dlength, PROT_READ,
-			MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+	char *daddr = mmap(mmap_addr, dlength, PROT_READ,
+			MAP_PRIVATE | MAP_ANONYMOUS | mmap_flags, -1, 0);
 	if (daddr == MAP_FAILED) {
+		if (errno == EEXIST) {
+			ERR("!mmap MAP_FIXED_NOREPLACE");
+			return PMEM2_E_ERRNO;
+		}
 		ERR("!mmap MAP_ANONYMOUS");
 		return PMEM2_E_ERRNO;
 	}
@@ -353,11 +361,22 @@ pmem2_map(const struct pmem2_config *cfg, struct pmem2_map **map_ptr)
 	const size_t alignment = get_map_alignment(content_length,
 			cfg->alignment);
 
+	/* let's get addr and mmap_flags from cfg */
+	ret = pmem2_config_validate_addr_alignment(cfg);
+	if (ret)
+		return ret;
+	void *mmap_addr = cfg->addr;
+	int mmap_flags = cfg->flags;
+
 	/* find a hint for the mapping */
 	void *reserv = NULL;
-	ret = map_reserve(content_length, alignment, &reserv, &reserved_length);
+	ret = map_reserve(content_length, alignment, &reserv, &reserved_length,
+			mmap_addr, mmap_flags);
 	if (ret != 0) {
-		LOG(1, "cannot find a contiguous region of given size");
+		if (errno == EEXIST)
+			LOG(1, "given mapping region is already occupied");
+		else
+			LOG(1, "cannot find a contiguous region of given size");
 		return ret;
 	}
 	ASSERTne(reserv, NULL);

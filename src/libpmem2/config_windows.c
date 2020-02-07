@@ -169,3 +169,12 @@ pmem2_config_get_alignment(const struct pmem2_config *cfg, size_t *alignment)
 
 	return 0;
 }
+
+/*
+ * pmem2_config_set_address -- sets address in the config struct
+ */
+int
+pmem2_config_set_address(struct pmem2_config *cfg, void *addr, int type)
+{
+	return PMEM2_E_NOSUPP;
+}

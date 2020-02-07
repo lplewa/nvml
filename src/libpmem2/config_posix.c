@@ -210,3 +210,30 @@ pmem2_config_get_alignment(const struct pmem2_config *cfg, size_t *alignment)
 
 	return 0;
 }
+
+/*
+ * pmem2_config_set_address -- sets address and mmap flag in the config struct
+ */
+int
+pmem2_config_set_address(struct pmem2_config *cfg, void *addr, int type)
+{
+	if (type & ~PMEM2_E_MAP_VALID_FLAGS) {
+		ERR("invalid flags 0x%x", type);
+		return PMEM2_E_INVALID_MMAP_FLAG;
+	}
+
+	/*
+	 * after support to PMEM2_ADDRESS_FIXED_REPLACE, this flag should be
+	 * added to this if statement
+	 */
+	if (type == PMEM2_ADDRESS_FIXED_NOREPLACE && !addr) {
+		ERR("cannot use flag PMEM2_ADDRESS_FIXED_NOREPLACE with"
+				" addr being NULL");
+		return PMEM2_E_INVALID_MMAP_FLAG;
+	}
+
+	cfg->flags = type;
+	cfg->addr = addr;
+
+	return 0;
+}
