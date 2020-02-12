@@ -726,7 +726,7 @@ test_map_fixed_noreplace_full_overlap(const struct test_case *tc,
 	prepare_config_extended(&cfg_overlap, &fd_overlap, file, size, 0,
 			O_RDWR, addr, PMEM2_ADDRESS_FIXED_NOREPLACE);
 	ret = pmem2_map(&cfg_overlap, &map_overlap);
-	ASSERTeq(addr, map_overlap->addr);
+	UT_ASSERTeq(addr, map_overlap->addr);
 
 	UT_PMEM2_EXPECT_RETURN(ret, -EEXIST);
 
