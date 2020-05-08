@@ -13,6 +13,7 @@
 
 #include <windows.h>
 #include <stdio.h>
+#include <getopt.h>
 #include "util.h"
 
 #define MAXPRINT 8192
@@ -183,8 +184,9 @@ wmain(int argc, const wchar_t *argv[])
 	}
 
 	int i = 1;
-	while (i < argc && argv[i][0] == '-') {
-		switch (argv[i][1]) {
+	int opt;
+	while ((opt = getopt(argc, argv, "vsf")) != -1) {
+		switch (opt) {
 			case 'v':
 				Opt_verbose = 1;
 				break;
@@ -198,11 +200,10 @@ wmain(int argc, const wchar_t *argv[])
 				out_err(L"Unknown option: \'%c\'.", argv[i][1]);
 				exit(2);
 		}
-		++i;
 	}
 
-	const wchar_t *filename = argv[i];
-	long long len = _wtoll(argv[i + 1]);
+	const wchar_t *filename = argv[optind];
+	long long len = _wtoll(argv[optind + 1]);
 
 	if (len < 0) {
 		out_err(L"Invalid file length: %lld.\n", len);
