@@ -8,7 +8,9 @@
 . ..\unittest\unittest.ps1
 
 require_test_type medium
-require_fs_type any
+# dax on windows doesn't support sparse files
+require_fs_type non-pmem
+
 #
 # For a large pool, util_map consumes so much memory.
 #
