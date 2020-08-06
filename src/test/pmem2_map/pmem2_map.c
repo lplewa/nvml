@@ -475,7 +475,8 @@ test_unmap_zero_length(const struct test_case *tc, int argc, char *argv[])
 
 	char *file = argv[0];
 	size_t size = ATOUL(argv[1]);
-	unmap_invalid_common(file, size, map_spoil_set_zero_length, -EINVAL);
+	unmap_invalid_common(file, size, map_spoil_set_zero_length,
+		PMEM2_E_MAPPING_NOT_FOUND);
 
 	return 2;
 }

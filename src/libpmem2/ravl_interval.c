@@ -42,12 +42,11 @@ ravl_interval_compare(const void *lhs, const void *rhs)
 	const struct ravl_interval_node *left = lhs;
 	const struct ravl_interval_node *right = rhs;
 
-	if (left->get_min(left->addr) < right->get_min(right->addr) &&
-		left->get_max(left->addr) <= right->get_min(right->addr))
+	if (left->get_max(left->addr) <= right->get_min(right->addr))
 		return -1;
-	if (left->get_min(left->addr) > right->get_min(right->addr) &&
-		left->get_max(left->addr) >= right->get_min(right->addr))
+	if (left->get_min(left->addr) > right->get_max(right->addr))
 		return 1;
+
 	return 0;
 }
 
