@@ -34,6 +34,13 @@ test_set_from_pmem2_valid(const struct test_case *tc, int argc, char *argv[])
 	UT_PMEMSET_EXPECT_RETURN(ret, 0);
 	UT_ASSERTne(src_set, NULL);
 
+	ret = pmemset_source_delete(&src_set);
+	UT_PMEMSET_EXPECT_RETURN(ret, 0);
+	UT_ASSERTeq(src_set, NULL);
+
+	ret = pmem2_source_delete(&src_pmem2);
+	UT_PMEMSET_EXPECT_RETURN(ret, 0);
+
 	CLOSE(fd);
 
 	return 1;
@@ -80,6 +87,10 @@ test_alloc_src_enomem(const struct test_case *tc, int argc, char *argv[])
 	ret = pmemset_source_from_pmem2(&src_set, src_pmem2);
 	UT_PMEMSET_EXPECT_RETURN(ret, -ENOMEM);
 	UT_ASSERTeq(src_set, NULL);
+
+	ret = pmem2_source_delete(&src_pmem2);
+	UT_PMEMSET_EXPECT_RETURN(ret, 0);
+
 	CLOSE(fd);
 	return 1;
 }
@@ -107,7 +118,7 @@ test_src_from_file_valid(const struct test_case *tc, int argc,
 		char *argv[])
 {
 	if (argc < 1)
-		UT_FATAL("usage: test_source_from_file_valid <path>");
+		UT_FATAL("usage: test_src_from_file_valid <path>");
 
 	const char *file = argv[0];
 
@@ -119,6 +130,10 @@ test_src_from_file_valid(const struct test_case *tc, int argc,
 	char *path_from_src;
 	pmemset_source_get_filepath(src, &path_from_src);
 	UT_ASSERT(strcmp(file, path_from_src) == 0);
+
+	ret = pmemset_source_delete(&src);
+	UT_PMEMSET_EXPECT_RETURN(ret, 0);
+	UT_ASSERTeq(src, NULL);
 
 	return 1;
 }

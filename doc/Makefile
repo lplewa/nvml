@@ -124,7 +124,7 @@ MANPAGES_3_MD_PMEMSET = libpmemset/pmemset_errormsg.3.md libpmemset/pmemset_perr
 			libpmemset/pmemset_part_new.3.md
 MANPAGES_1_MD_PMEMSET =
 ifeq ($(PMEMSET_INSTALL),y)
-MANPAGES_3_DUMMY += libpmemset/pmemset_config_delete.3
+MANPAGES_3_DUMMY += libpmemset/pmemset_config_delete.3 libpmemset/pmemset_source_delete.3
 endif
 
 ifeq ($(BUILD_RPMEM),y)
